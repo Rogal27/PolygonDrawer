@@ -5,8 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GKProjekt1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Polygons" Height="720" Width="1280" ResizeMode="NoResize">
+    <Window.Resources>
+        <Style x:Key="ModeButton" TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Margin" Value="10,10,10,10"/>
+            <Setter Property="Padding" Value="10,10,10,10"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <WrapPanel VerticalAlignment="Center" Background="LightGray">
+            <RadioButton Name="PointerButton" Style="{StaticResource ModeButton}" Content="Mouse Pointer" IsChecked="True" Click="PointerMode_Click"/>
+            <RadioButton Name="DrawButton" Style="{StaticResource ModeButton}" Content="Draw" Click="DrawMode_Click"/>
+            <RadioButton Style="{StaticResource ModeButton}" Content="Add Equality"/>
+            <RadioButton Style="{StaticResource ModeButton}" Width="auto" Content="Add Perpendicular"/>
+            <RadioButton Style="{StaticResource ModeButton}" Content="Delete"/>
+            <RadioButton Style="{StaticResource ModeButton}" Width="auto" Content="Generate Sample Polygon"/>
+        </WrapPanel>
+        <Canvas Grid.Row="1" Name="PolygonCanvas" Background="White" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="PolygonCanvas_MouseMove">
+        </Canvas>
     </Grid>
 </Window>
