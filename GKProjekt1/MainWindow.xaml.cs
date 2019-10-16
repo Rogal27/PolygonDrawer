@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+//kupa
+
 namespace GKProjekt1
 {
     /// <summary>
@@ -21,10 +23,11 @@ namespace GKProjekt1
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Mode ProgramMode { get; set; } 
+        public Mode ProgramMode { get; set; }
 
         private bool FirstMouseClick = true;
         private bool PolygonDrawing = false;
+        private bool IsDraggingOn = false;
         private MyPolygon CurrentlyDrawingPolygon = null;
         private int PolygonNumber = 0;
 
@@ -43,54 +46,105 @@ namespace GKProjekt1
             Canvas currentCanvas = sender as Canvas;
             Point p = e.GetPosition(currentCanvas);
             //Debug.WriteLine("Click"); 
-            if (ProgramMode == Mode.Draw)
+            switch (ProgramMode)
             {
-                if (PolygonDrawing == false)
-                {
-                    MyPolygon polygon = new MyPolygon(p);
-                    polygon.DrawStartingVerticle(currentCanvas);
-                    CurrentlyDrawingPolygon = polygon;
-                    //FirstMouseClick = false;
-                    PolygonDrawing = true;
-                    if (CurrentLine != null)
+                case Mode.Pointer:
+                    IsDraggingOn = true;
+                    break;
+                case Mode.Draw:
                     {
-                        currentCanvas.Children.Remove(CurrentLine);
-                    }
-                    CurrentLine = Draw.Edge(p, p, currentCanvas);
-                }
-                else
-                {
-                    CurrentLine.X1 = p.X;
-                    CurrentLine.Y1 = p.Y;
-                    if (CurrentlyDrawingPolygon.AddVerticleAndDraw(p) == false)
-                    {
-                        PolygonDrawing = false;
-                        Polygons.Add(PolygonNumber, CurrentlyDrawingPolygon);
-                        
-                        PolygonNumber++;
+                        if (PolygonDrawing == false)
+                        {
+                            MyPolygon polygon = new MyPolygon(p);
+                            polygon.DrawStartingVerticle(currentCanvas);
+                            CurrentlyDrawingPolygon = polygon;
+                            //FirstMouseClick = false;
+                            PolygonDrawing = true;
+                            if (CurrentLine != null)
+                            {
+                                currentCanvas.Children.Remove(CurrentLine);
+                            }
+                            CurrentLine = Draw.Edge(p, p, currentCanvas);
+                        }
+                        else
+                        {
+                            var DrawResult = CurrentlyDrawingPolygon.AddVerticleAndDraw(p);
+                            switch (DrawResult)
+                            {
+                                case PolygonDrawResult.DrawFinished:
+                                    CurrentLine.X1 = p.X;
+                                    CurrentLine.Y1 = p.Y;
+                                    PolygonDrawing = false;
+                                    Polygons.Add(PolygonNumber, CurrentlyDrawingPolygon);
 
-                        CurrentlyDrawingPolygon = null;
+                                    PolygonNumber++;
+
+                                    CurrentlyDrawingPolygon = null;
+                                    break;
+                                case PolygonDrawResult.NotEnoughEdges:
+                                    MessageBox.Show("Not enough edges to finish polygon", "Polygons", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                    break;
+                                case PolygonDrawResult.DrawInProgress:
+                                    CurrentLine.X1 = p.X;
+                                    CurrentLine.Y1 = p.Y;
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                        }
                     }
-                }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (ProgramMode == Mode.Pointer)
+            {
+                IsDraggingOn = false;
             }
         }
 
         private void PolygonCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             Canvas currentCanvas = sender as Canvas;
-            
+
             Point p = e.GetPosition(currentCanvas);
             //Debug.WriteLine($"MouseMove X:{p.X},Y:{p.Y} #{counter++}");
-            if (ProgramMode == Mode.Draw)
+            switch (ProgramMode)
             {
-                if (PolygonDrawing == true)
-                {
-                    if (CurrentLine != null)
+                case Mode.Pointer://moving points and edges and polygons
+                    if (IsDraggingOn == true)
                     {
-                        CurrentLine.X2 = p.X;
-                        CurrentLine.Y2 = p.Y;
+                        foreach(var pol in Polygons)
+                        {
+                            foreach(var edge in pol.Value.Edges)
+                            {
+                                //check if point hit
+                                if (PointExtension.AreNear(edge.first, p, Globals.VerticleClickRadiusSize) == true)
+                                {
+                                    double X = p.X - (double)Globals.VerticleSize / 2.0;
+                                    double Y = p.Y - (double)Globals.VerticleSize / 2.0;
+                                    Canvas.SetLeft(edge.firstEllipse, X);
+                                    Canvas.SetTop(edge.firstEllipse, Y);
+                                }
+                            }
+                        }
                     }
-                }
+                    break;
+                case Mode.Draw:
+                    if (PolygonDrawing == true)
+                    {
+                        if (CurrentLine != null)
+                        {
+                            CurrentLine.X2 = p.X;
+                            CurrentLine.Y2 = p.Y;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -105,15 +159,18 @@ namespace GKProjekt1
                 {
                     return false;
                 }
-
-                CurrentlyDrawingPolygon.DeleteDrawing();
-                if (CurrentLine != null)
+                else
                 {
-                    CurrentlyDrawingPolygon.canvas.Children.Remove(CurrentLine);
+                    CurrentlyDrawingPolygon.DeleteDrawing();
+                    if (CurrentLine != null)
+                    {
+                        CurrentlyDrawingPolygon.canvas.Children.Remove(CurrentLine);
+                    }
+                    CurrentLine = null;
+                    CurrentlyDrawingPolygon = null;
+                    PolygonDrawing = false;
                 }
-                CurrentLine = null;
-                CurrentlyDrawingPolygon = null;
-            }            
+            }
             return true;
         }
 
@@ -132,7 +189,7 @@ namespace GKProjekt1
 
         private void DrawMode_Click(object sender, RoutedEventArgs e)
         {
-            ProgramMode = Mode.Draw; 
+            ProgramMode = Mode.Draw;
         }
     }
 }

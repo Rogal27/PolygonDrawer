@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GKProjekt1"
         mc:Ignorable="d"
-        Title="Polygons" Height="720" Width="1280" ResizeMode="NoResize">
+        Title="Polygons" Height="720" Width="1280" MinHeight="720" MinWidth="1280">
     <Window.Resources>
         <Style x:Key="ModeButton" TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
             <Setter Property="Height" Value="40"/>
@@ -28,7 +28,7 @@
             <RadioButton Style="{StaticResource ModeButton}" Content="Delete"/>
             <RadioButton Style="{StaticResource ModeButton}" Width="auto" Content="Generate Sample Polygon"/>
         </WrapPanel>
-        <Canvas Grid.Row="1" Name="PolygonCanvas" Background="White" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="PolygonCanvas_MouseMove">
+        <Canvas Grid.Row="1" Name="PolygonCanvas" Background="White" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="PolygonCanvas_MouseMove" MouseLeftButtonUp="Canvas_MouseLeftButtonUp" >
         </Canvas>
     </Grid>
 </Window>

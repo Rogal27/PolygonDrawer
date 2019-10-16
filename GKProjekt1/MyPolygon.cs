@@ -53,14 +53,16 @@ namespace GKProjekt1
             }
         }
 
-        public bool AddVerticleAndDraw(Point p)
+        public PolygonDrawResult AddVerticleAndDraw(Point p)
         {
             if (PointExtension.AreNear(p, StartingVerticle, (double)Globals.VerticleClickRadiusSize / 2.0) == true)
             {
+                if (Edges.Count < 2)
+                    return PolygonDrawResult.NotEnoughEdges;
                 Line line = Draw.Edge(LastVerticle, StartingVerticle, canvas);
                 MyEdge e = new MyEdge(LastVerticle, StartingVerticle, LastVerticleEllipse, StartingVerticleEllipse, line);
                 Edges.Add(e);
-                return false;
+                return PolygonDrawResult.DrawFinished;
             }
             else
             {
@@ -70,7 +72,7 @@ namespace GKProjekt1
                 LastVerticle = p;
                 LastVerticleEllipse = secondEllipse;
                 Edges.Add(e);
-                return true;
+                return PolygonDrawResult.DrawInProgress;
             }
         }
 
@@ -80,6 +82,7 @@ namespace GKProjekt1
             {
                 canvas.Children.Remove(edge.line);
                 canvas.Children.Remove(edge.firstEllipse);
+                canvas.Children.Remove(edge.secondEllipse);
             }
         }
 
