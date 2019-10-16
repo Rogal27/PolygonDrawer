@@ -87,11 +87,12 @@ namespace GKProjekt1
                                 }
                             }
                             //check if inside Polygon
-                            if (false)
-                            {
-                                ;
-                                return;
-                            }
+                            //if (false)
+                            //{
+                            //    ;
+                            //    return;
+                            //}
+                            pol.Value.IsPointInside(CurrentMousePosition);
                         }
                         CurrentDragObject = DragObjectType.Nothing;
                     }
@@ -202,39 +203,6 @@ namespace GKProjekt1
                             default:
                                 break;
                         }
-                        //foreach (var pol in Polygons)
-                        //{
-                        //    if (CurrentDragObject == DragObjectType.Verticle || CurrentDragObject == DragObjectType.Edge)
-                        //{
-                        //    var previousEdge = pol.Value.Edges.Last();
-                        //    foreach (var edge in pol.Value.Edges)
-                        //    {
-                        //        //check if point hit
-                        //        if (CurrentDragObject == DragObjectType.Verticle)
-                        //        {
-                        //            if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
-                        //            {
-                        //                edge.first.Move(CurrentMousePosition.X, CurrentMousePosition.Y);
-                        //                edge.MoveWithPoints();
-                        //                previousEdge.MoveWithPoints();
-                        //                currentCanvas.Cursor = Cursors.Arrow;
-                        //                return;
-                        //            }
-                        //        }
-                        //        else if (CurrentDragObject == DragObjectType.Edge)
-                        //        {
-                        //            //check if edge hit
-                        //            if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
-                        //            {
-                        //                //move edge
-                        //                edge.MoveParallel(DragStartingPoint, CurrentMousePosition);
-                        //                DragStartingPoint = CurrentMousePosition;
-                        //                return;
-                        //            }
-                        //        }
-                        //        previousEdge = edge;
-                        //    }
-                        //}
                     }
                     break;
                 case Mode.Draw:

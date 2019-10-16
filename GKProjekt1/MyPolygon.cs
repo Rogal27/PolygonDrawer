@@ -78,6 +78,63 @@ namespace GKProjekt1
             }
         }
 
+        public bool IsPointInside(Point p)
+        {
+            //testing RemoveCollinearEdges
+            //var edgeFirst = Edges[0];
+            //var edgeThird = Edges[2];
+            //var myEdge1 = new MyEdge(edgeFirst.second, new MyPoint(edgeFirst.second.X + 50, edgeFirst.second.Y));
+            //var myEdge2 = new MyEdge(new MyPoint(edgeFirst.second.X + 50, edgeFirst.second.Y), new MyPoint(edgeFirst.second.X + 100, edgeFirst.second.Y));
+            //edgeThird.first = myEdge2.second;
+            //Edges.RemoveAt(1);
+            //Edges.Insert(1, myEdge2);
+            //Edges.Insert(1, myEdge1);
+
+            List<MyEdge> ClearEdges = RemoveCollinearEdges();
+            //TODO:
+            //implement algorithm
+            return false;
+        }
+
+        private List<MyEdge> RemoveCollinearEdges()
+        {
+            List<MyEdge> ClearEdges = new List<MyEdge>();
+            //var nextEdge = Edges.Last();
+            MyEdge tmpEdge = null;
+            MyEdge edge = null;
+            bool AreCollinear = false;
+
+            for (int i = 0; i < Edges.Count; i++)
+            {
+                if (AreCollinear == true)
+                {
+                    edge = tmpEdge;
+                }
+                else
+                {
+                    edge = Edges[i];
+                }
+                var nextEdge = Edges[(i + 1) % Edges.Count];
+                if (MyPoint.CheckIfCollinear(edge.first, edge.second, nextEdge.second) == true)
+                {
+                    tmpEdge = new MyEdge(edge.first, nextEdge.second);
+                    AreCollinear = true;
+                    if (i == Edges.Count - 1)
+                    {
+                        var finalEdge = new MyEdge(tmpEdge.first, ClearEdges.First().second);
+                        ClearEdges.Add(finalEdge);
+                        ClearEdges.RemoveAt(0);
+                    }
+                }
+                else
+                {
+                    ClearEdges.Add(edge);
+                    AreCollinear = false;
+                }
+            }
+            return ClearEdges;
+        }
+
         public void DeleteDrawing()
         {
             foreach(var edge in Edges)
