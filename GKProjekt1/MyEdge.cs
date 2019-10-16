@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace GKProjekt1
@@ -68,14 +69,16 @@ namespace GKProjekt1
             return EdgePoint;
         }
 
-        public void MoveParallel(Point p)
+        public void MoveParallel(Point p,Canvas canvas)
         {
             Point offset = FindClosestPointOnEdge(p);
-            var x = p.X - offset.X;
-            var y = p.Y - offset.Y;
-            first.Move(first.X + x, first.Y + y);
-            second.Move(second.X + x, second.Y + y);
-            MoveWithPoints();
+            MyPoint point = new MyPoint(offset.X, offset.Y);
+            Draw.Verticle(point, canvas);
+            //var x = p.X - offset.X;
+            //var y = p.Y - offset.Y;
+            //first.Move(first.X + x, first.Y + y);
+            //second.Move(second.X + x, second.Y + y);
+            //MoveWithPoints();
         }
 
         public bool IsNearPoint(Point p, double distance)
