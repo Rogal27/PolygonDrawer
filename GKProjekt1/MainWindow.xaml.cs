@@ -27,7 +27,7 @@ namespace GKProjekt1
         private bool PolygonDrawing = false;
         private bool IsDraggingOn = false;
         private DragObject CurrentDragObject = DragObject.Nothing;
-        private MyPoint DragStartingPoint = null;
+        private Point DragStartingPoint = new Point();
         private MyPolygon CurrentlyDrawingPolygon = null;
         private int PolygonNumber = 0;
 
@@ -66,6 +66,8 @@ namespace GKProjekt1
                                 else if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
                                 {
                                     CurrentDragObject = DragObject.Edge;
+                                    DragStartingPoint.X = CurrentMousePosition.X;
+                                    DragStartingPoint.Y = CurrentMousePosition.Y;
                                     return;
                                 }                                
                             }
@@ -169,7 +171,8 @@ namespace GKProjekt1
                                         if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
                                         {
                                             //move edge
-                                            edge.MoveParallel(CurrentMousePosition, currentCanvas);
+                                            edge.MoveParallel(DragStartingPoint, CurrentMousePosition);
+                                            DragStartingPoint = CurrentMousePosition;
                                             return;
                                         }
                                     }

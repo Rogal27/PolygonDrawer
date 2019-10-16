@@ -69,16 +69,16 @@ namespace GKProjekt1
             return EdgePoint;
         }
 
-        public void MoveParallel(Point p,Canvas canvas)
+        public void MoveParallel(Point startPoint, Point endPoint)
         {
-            Point offset = FindClosestPointOnEdge(p);
-            MyPoint point = new MyPoint(offset.X, offset.Y);
-            Draw.Verticle(point, canvas);
-            //var x = p.X - offset.X;
-            //var y = p.Y - offset.Y;
-            //first.Move(first.X + x, first.Y + y);
-            //second.Move(second.X + x, second.Y + y);
-            //MoveWithPoints();
+            //Point offset = FindClosestPointOnEdge(p);
+            //MyPoint point = new MyPoint(offset.X, offset.Y);
+            //Draw.Verticle(point, canvas);
+            var x = endPoint.X - startPoint.X;
+            var y = endPoint.Y - startPoint.Y;
+            first.Move(first.X + x, first.Y + y);
+            second.Move(second.X + x, second.Y + y);
+            MoveWithPoints();
         }
 
         public bool IsNearPoint(Point p, double distance)

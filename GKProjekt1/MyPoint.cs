@@ -15,10 +15,11 @@ namespace GKProjekt1
         public double Y { get; set; }
         public Ellipse ellipse { get; set; }
 
-        //public MyPoint()
-        //{
-        //
-        //}
+        public MyPoint()
+        {
+            X = 0.0;
+            Y = 0.0;
+        }
 
         public MyPoint(double x, double y)
         {
