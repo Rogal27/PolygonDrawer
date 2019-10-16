@@ -26,6 +26,7 @@ namespace GKProjekt1
         //private bool FirstMouseClick = true;
         private bool PolygonDrawing = false;
         private bool IsDraggingOn = false;
+        private DragObject CurrentDragObject = DragObject.Nothing;
         private MyPolygon CurrentlyDrawingPolygon = null;
         private int PolygonNumber = 0;
 
@@ -48,7 +49,34 @@ namespace GKProjekt1
             switch (ProgramMode)
             {
                 case Mode.Pointer:
-                    IsDraggingOn = true;
+                    {
+                        IsDraggingOn = true;
+                        foreach (var pol in Polygons)
+                        {
+                            foreach (var edge in pol.Value.Edges)
+                            {
+                                //check if point hit
+                                if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
+                                {
+                                    CurrentDragObject = DragObject.Verticle;
+                                    return;
+                                }
+                                //check if edge hit
+                                else if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                {
+                                    CurrentDragObject = DragObject.Edge;
+                                    return;
+                                }                                
+                            }
+                            //check if inside Polygon
+                            if (false)
+                            {
+                                ;
+                                return;
+                            }
+                        }
+                        CurrentDragObject = DragObject.Nothing;
+                    }
                     break;
                 case Mode.Draw:
                     {
@@ -109,35 +137,35 @@ namespace GKProjekt1
         private void PolygonCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             Canvas currentCanvas = sender as Canvas;
-
             Point CurrentMousePosition = e.GetPosition(currentCanvas);
-            //MyPoint p = new MyPoint(CurrentMousePosition.X, CurrentMousePosition.Y);
-            //Debug.WriteLine($"MouseMove X:{p.X},Y:{p.Y} #{counter++}");
             switch (ProgramMode)
             {
                 case Mode.Pointer://moving points and edges and polygons
-                    if (IsDraggingOn == true)
+                    if (IsDraggingOn == true && CurrentDragObject != DragObject.Nothing)
                     {
                         foreach(var pol in Polygons)
-                        {
-                            var previousEdge = pol.Value.Edges.Last();
-                            foreach(var edge in pol.Value.Edges)
+                        {                            
+                            if (CurrentDragObject == DragObject.Verticle || CurrentDragObject == DragObject.Edge)
                             {
-                                //check if point hit
-                                if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
+                                var previousEdge = pol.Value.Edges.Last();
+                                foreach (var edge in pol.Value.Edges)
                                 {
-                                    edge.first.Move(CurrentMousePosition.X, CurrentMousePosition.Y);
-                                    edge.MoveWithPoints();
-                                    previousEdge.MoveWithPoints();
+                                    //check if point hit
+                                    if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
+                                    {
+                                        edge.first.Move(CurrentMousePosition.X, CurrentMousePosition.Y);
+                                        edge.MoveWithPoints();
+                                        previousEdge.MoveWithPoints();
+                                        currentCanvas.Cursor = Cursors.Arrow;
+                                    }
+                                    //check if edge hit
+                                    else if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                    {
+                                        //move edge
+                                        edge.MoveParallel(CurrentMousePosition);
+                                    }
+                                    previousEdge = edge;
                                 }
-                                //check if edge hit
-                                else if()
-                                {
-
-                                }
-
-
-                                previousEdge = edge;
                             }
                         }
                     }
@@ -160,7 +188,7 @@ namespace GKProjekt1
             if (CurrentlyDrawingPolygon != null)
             {
                 MessageBoxResult ans = MessageBox.Show("If you change mode during drawing,\n" +
-                    "currently drown polygon will be deleted!\n" +
+                    "currently drawn polygon will be deleted!\n" +
                     "Do you want to continue drawing?", "Polygons", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (ans == MessageBoxResult.Yes)
                 {

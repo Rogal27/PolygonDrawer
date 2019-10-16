@@ -15,6 +15,7 @@ namespace GKProjekt1
         public static int VerticleSize = 10;
         public static int VerticleClickRadiusSize = 15;
         public static int LineThickness = 4;
+        public static int LineClickDistance = 5;
         public static int VerticleZIndex = 10;
         public static int LineZIndex = 5;
     }

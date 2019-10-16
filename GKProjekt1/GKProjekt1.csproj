@@ -57,6 +57,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DragObject.cs" />
     <Compile Include="Draw.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="MyPoint.cs" />
