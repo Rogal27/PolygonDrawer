@@ -40,34 +40,31 @@ namespace GKProjekt1
             line.Y2 = second.Y;
         }
 
-        private Point FindClosestPointOnEdge(Point p)
-        {
-            Point EdgePoint = new Point();
-            (double, double) vectorAP = (p.X - first.X, p.Y - first.Y);       //Vector from A to P   
-            (double, double) vectorAB = (second.X - first.X, second.Y - first.Y);       //Vector from A to B  
-
-            double magnitudeAB = vectorAB.Item1 * vectorAB.Item1 + vectorAB.Item2 * vectorAB.Item2;   //Magnitude of AB vector (it's length squared)     
-            double ABAPproduct = vectorAB.Item1 * vectorAP.Item1 + vectorAB.Item2 + vectorAP.Item2;    //The DOT product of a_to_p and a_to_b     
-            double distance = ABAPproduct / magnitudeAB; //The normalized "distance" from a to your closest point  
-
-            if (distance < 0)     //Check if P projection is over vectorAB     
-            {
-                EdgePoint.X = first.X;
-                EdgePoint.Y = first.Y;
-
-            }
-            else if (distance > 1)
-            {
-                EdgePoint.X = second.X;
-                EdgePoint.Y = second.Y;
-            }
-            else
-            {
-                EdgePoint.X = first.X + vectorAB.Item1 * distance;
-                EdgePoint.Y = first.Y + vectorAB.Item2 * distance;
-            }
-            return EdgePoint;
-        }
+        //private Point FindClosestPointOnEdge(Point p)
+        //{
+        //    Point EdgePoint = new Point();
+        //    (double, double) vectorAP = (p.X - first.X, p.Y - first.Y);       //Vector from A to P   
+        //    (double, double) vectorAB = (second.X - first.X, second.Y - first.Y);       //Vector from A to B  
+        //    double magnitudeAB = vectorAB.Item1 * vectorAB.Item1 + vectorAB.Item2 * vectorAB.Item2;   //Magnitude of AB vector (it's length squared)     
+        //    double ABAPproduct = vectorAB.Item1 * vectorAP.Item1 + vectorAB.Item2 + vectorAP.Item2;    //The DOT product of a_to_p and a_to_b     
+        //    double distance = ABAPproduct / magnitudeAB; //The normalized "distance" from a to your closest point  
+        //    if (distance < 0)     //Check if P projection is over vectorAB    
+        //    {
+        //        EdgePoint.X = first.X;
+        //        EdgePoint.Y = first.Y;
+        //    }
+        //    else if (distance > 1)
+        //    {
+        //        EdgePoint.X = second.X;
+        //        EdgePoint.Y = second.Y;
+        //    }
+        //    else
+        //    {
+        //        EdgePoint.X = first.X + vectorAB.Item1 * distance;
+        //        EdgePoint.Y = first.Y + vectorAB.Item2 * distance;
+        //    }
+        //    return EdgePoint;
+        //}
 
         public void MoveParallel(Point startPoint, Point endPoint)
         {

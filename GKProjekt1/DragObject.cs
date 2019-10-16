@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GKProjekt1
 {
-    public enum DragObject
+    public enum DragObjectType
     {
         Nothing,
         Verticle,

@@ -35,6 +35,14 @@ namespace GKProjekt1
             Canvas.SetTop(ellipse, newY - (double)Globals.VerticleSize / 2.0);
         }
 
+        public void Move(Point p)
+        {
+            X = p.X;
+            Y = p.Y;
+            Canvas.SetLeft(ellipse, p.X - (double)Globals.VerticleSize / 2.0);
+            Canvas.SetTop(ellipse, p.Y - (double)Globals.VerticleSize / 2.0);
+        }
+
         public static bool AreNear(MyPoint p1, MyPoint p2, double radius)
         {
             return Math.Pow(radius, 2) > Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2);
