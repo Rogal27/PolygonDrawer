@@ -10,26 +10,40 @@ namespace GKProjekt1
 {
     public class MyEdge
     {
-        public Point first { get; set; }
-        public Point second { get; set; }
-
+        public MyPoint first { get; set; }
+        public MyPoint second { get; set; }
         public Line line { get; set; }
-        public Ellipse firstEllipse { get; set; }
-        public Ellipse secondEllipse { get; set; }
+        //public Ellipse firstEllipse { get; set; }
+        //public Ellipse secondEllipse { get; set; }
 
-        public MyEdge(Point first, Point second)
+        public MyEdge(MyPoint first, MyPoint second)
         {
             this.first = first;
             this.second = second;
         }
-        public MyEdge(Point first, Point second, Ellipse firstEllipse, Ellipse secondEllipse, Line line)
+
+        public MyEdge(MyPoint first, MyPoint second, Line line)
         {
             this.first = first;
             this.second = second;
-            this.firstEllipse = firstEllipse;
-            this.secondEllipse = secondEllipse;
+            //this.firstEllipse = firstEllipse;
+            //this.secondEllipse = secondEllipse;
             this.line = line;
         }
+
+        public void MoveWithPoints()
+        {
+            line.X1 = first.X;
+            line.Y1 = first.Y;
+            line.X2 = second.X;
+            line.Y2 = second.Y;
+        }
+
+        public bool IsNearPoint(Point p)
+        {
+
+        }
+
         public static bool operator ==(MyEdge e1, MyEdge e2)
         {
             if (e1.first == e2.first && e1.second == e2.second)
@@ -38,10 +52,12 @@ namespace GKProjekt1
                 return true;
             return false;
         }
+
         public static bool operator !=(MyEdge e1, MyEdge e2)
         {
             return !(e1 == e2);
         }
+
         public override bool Equals(object obj)
         {
             if (obj is MyEdge e)
@@ -50,6 +66,7 @@ namespace GKProjekt1
             }
             return false;
         }
+
         public override int GetHashCode()
         {
             return base.GetHashCode();

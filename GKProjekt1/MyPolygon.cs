@@ -12,65 +12,67 @@ namespace GKProjekt1
     public class MyPolygon
     {
         public List<MyEdge> Edges { get; set; } = new List<MyEdge>();
-        public Point StartingVerticle { get; set; }
-        public Ellipse StartingVerticleEllipse { get; set; }
+        public MyPoint StartingVerticle { get; set; }
+        //public Ellipse StartingVerticleEllipse { get; set; }
 
-        public Point LastVerticle { get; set; }
-        public Ellipse LastVerticleEllipse { get; set; }
+        public MyPoint LastVerticle { get; set; }
+        //public Ellipse LastVerticleEllipse { get; set; }
 
         public Dictionary<MyEdge, (MyEdge, RelationType)> Relations = new Dictionary<MyEdge, (MyEdge, RelationType)>();
 
         public Canvas canvas { get; set; }
 
-        public MyPolygon(Point startingVerticle)
+        public MyPolygon(MyPoint startingVerticle, Canvas canvas)
         {
             StartingVerticle = startingVerticle;
             LastVerticle = startingVerticle;
-        }
-
-        public void DrawStartingVerticle(Canvas canvas)
-        {
             this.canvas = canvas;
-            Ellipse ellipse = Draw.Verticle(StartingVerticle, this.canvas);
-            StartingVerticleEllipse = ellipse;
-            LastVerticleEllipse = ellipse;
+            Draw.Verticle(StartingVerticle, this.canvas);
         }
 
-        public bool AddVerticle(Point p)
-        {
-            if (PointExtension.AreNear(p, StartingVerticle, (double)Globals.VerticleClickRadiusSize / 2.0) == true)
-            {
-                MyEdge e = new MyEdge(LastVerticle, StartingVerticle);              
-                Edges.Add(e);
-                return false;
-            }
-            else
-            {
-                MyEdge e = new MyEdge(LastVerticle, p);
-                LastVerticle = p;
-                Edges.Add(e);
-                return true;
-            }
-        }
+        //public void DrawStartingVerticle(Canvas canvas)
+        //{
+        //    this.canvas = canvas;
+        //    Draw.Verticle(StartingVerticle, this.canvas);
+        //}
 
-        public PolygonDrawResult AddVerticleAndDraw(Point p)
+        //public bool AddVerticle(Point p)
+        //{
+        //    if (PointExtension.AreNear(p, StartingVerticle, (double)Globals.VerticleClickRadiusSize / 2.0) == true)
+        //    {
+        //        MyEdge e = new MyEdge(LastVerticle, StartingVerticle);              
+        //        Edges.Add(e);
+        //        return false;
+        //    }
+        //    else
+        //    {
+        //        MyEdge e = new MyEdge(LastVerticle, p);
+        //        LastVerticle = p;
+        //        Edges.Add(e);
+        //        return true;
+        //    }
+        //}
+
+        public PolygonDrawResult AddVerticleAndDraw(MyPoint p)
         {
-            if (PointExtension.AreNear(p, StartingVerticle, (double)Globals.VerticleClickRadiusSize / 2.0) == true)
+            if (MyPoint.AreNear(p, StartingVerticle, (double)Globals.VerticleClickRadiusSize / 2.0) == true)
             {
                 if (Edges.Count < 2)
                     return PolygonDrawResult.NotEnoughEdges;
-                Line line = Draw.Edge(LastVerticle, StartingVerticle, canvas);
-                MyEdge e = new MyEdge(LastVerticle, StartingVerticle, LastVerticleEllipse, StartingVerticleEllipse, line);
+                //Line line = Draw.Edge(LastVerticle, StartingVerticle, canvas);
+                MyEdge e = new MyEdge(LastVerticle, StartingVerticle);
+                Draw.Edge(e, canvas);
                 Edges.Add(e);
                 return PolygonDrawResult.DrawFinished;
             }
             else
             {
-                Line line = Draw.Edge(LastVerticle, p, canvas);
-                Ellipse secondEllipse = Draw.Verticle(p, canvas);
-                MyEdge e = new MyEdge(LastVerticle, p, LastVerticleEllipse, secondEllipse, line);
+                //Line line = Draw.Edge(LastVerticle, p, canvas);
+                //Ellipse secondEllipse = Draw.Verticle(p, canvas);
+                Draw.Verticle(p, canvas);
+                MyEdge e = new MyEdge(LastVerticle, p);
+                Draw.Edge(e, canvas);
                 LastVerticle = p;
-                LastVerticleEllipse = secondEllipse;
                 Edges.Add(e);
                 return PolygonDrawResult.DrawInProgress;
             }
@@ -81,8 +83,8 @@ namespace GKProjekt1
             foreach(var edge in Edges)
             {
                 canvas.Children.Remove(edge.line);
-                canvas.Children.Remove(edge.firstEllipse);
-                canvas.Children.Remove(edge.secondEllipse);
+                canvas.Children.Remove(edge.first.ellipse);
+                canvas.Children.Remove(edge.second.ellipse);
             }
         }
 

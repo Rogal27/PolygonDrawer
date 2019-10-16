@@ -11,7 +11,7 @@ namespace GKProjekt1
 {
     public static class Draw
     {
-        public static Ellipse Verticle(Point p, Canvas canvas)
+        public static void Verticle(MyPoint p, Canvas canvas)
         {
             Ellipse verticle = new Ellipse()
             {
@@ -23,10 +23,10 @@ namespace GKProjekt1
             Canvas.SetTop(verticle, p.Y - (double)Globals.VerticleSize / 2.0);
             Panel.SetZIndex(verticle, Globals.VerticleZIndex);
             canvas.Children.Add(verticle);
-            return verticle;
+            p.ellipse = verticle;
         }
 
-        public static Line Edge(MyEdge edge, Canvas canvas)
+        public static void Edge(MyEdge edge, Canvas canvas)
         {
             if (Globals.__Test__ == true)
             {
@@ -41,16 +41,16 @@ namespace GKProjekt1
                 };
                 Panel.SetZIndex(line, Globals.LineZIndex);
                 canvas.Children.Add(line);
-                return line;
+                edge.line = line;
             }
             else
             {
                 //algorytm Bresenhama
-                return null;
+                //return null;
             }
         }
 
-        public static Line Edge(Point first, Point second, Canvas canvas)
+        public static Line SimpleEdge(Point first, Point second, Canvas canvas)//used to draw temporary lines
         {
             if (Globals.__Test__ == true)
             {

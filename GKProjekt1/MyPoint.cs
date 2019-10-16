@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace GKProjekt1
@@ -11,12 +13,12 @@ namespace GKProjekt1
     {
         public double X { get; set; }
         public double Y { get; set; }
-        public Ellipse Verticle { get; set; }
+        public Ellipse ellipse { get; set; }
 
-        public MyPoint()
-        {
-
-        }
+        //public MyPoint()
+        //{
+        //
+        //}
 
         public MyPoint(double x, double y)
         {
@@ -24,10 +26,52 @@ namespace GKProjekt1
             Y = y;
         }
 
-        public void Offset(double offsetX, double offsetY)
+        public void Move(double newX, double newY)
         {
-            X += offsetX;
-            Y += offsetY;
+            X = newX;
+            Y = newY;
+            Canvas.SetLeft(ellipse, newX - (double)Globals.VerticleSize / 2.0);
+            Canvas.SetTop(ellipse, newY - (double)Globals.VerticleSize / 2.0);
+        }
+
+        public static bool AreNear(MyPoint p1, MyPoint p2, double radius)
+        {
+            return Math.Pow(radius, 2) > Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2);
+        }
+        public static bool AreNear(Point p1, MyPoint p2, double radius)
+        {
+            return Math.Pow(radius, 2) > Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2);
+        }
+
+        public static bool AreNear(MyPoint p1, Point p2, double radius)
+        {
+            return Math.Pow(radius, 2) > Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2);
+        }
+
+        public static bool operator ==(MyPoint p1, MyPoint p2)
+        {
+            if (p1.X == p2.X && p1.Y == p2.Y)
+                return true;
+            else
+                return false;
+        }
+
+        public static bool operator !=(MyPoint p1, MyPoint p2)
+        {
+            return !(p1 == p2);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MyPoint e)
+            {
+                return this == e;
+            }
+            return false;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

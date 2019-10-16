@@ -23,7 +23,7 @@ namespace GKProjekt1
     {
         public Mode ProgramMode { get; set; }
 
-        private bool FirstMouseClick = true;
+        //private bool FirstMouseClick = true;
         private bool PolygonDrawing = false;
         private bool IsDraggingOn = false;
         private MyPolygon CurrentlyDrawingPolygon = null;
@@ -31,7 +31,7 @@ namespace GKProjekt1
 
         private Line CurrentLine = null;
 
-        private double counter = 0.0;
+        //private double counter = 0.0;
 
         private Dictionary<int, MyPolygon> Polygons = new Dictionary<int, MyPolygon>();
         public MainWindow()
@@ -42,8 +42,9 @@ namespace GKProjekt1
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Canvas currentCanvas = sender as Canvas;
-            Point p = e.GetPosition(currentCanvas);
-            //Debug.WriteLine("Click"); 
+            Point CurrentMousePosition = e.GetPosition(currentCanvas);
+            MyPoint p = new MyPoint(CurrentMousePosition.X, CurrentMousePosition.Y);
+            
             switch (ProgramMode)
             {
                 case Mode.Pointer:
@@ -53,16 +54,14 @@ namespace GKProjekt1
                     {
                         if (PolygonDrawing == false)
                         {
-                            MyPolygon polygon = new MyPolygon(p);
-                            polygon.DrawStartingVerticle(currentCanvas);
+                            MyPolygon polygon = new MyPolygon(p, currentCanvas);
                             CurrentlyDrawingPolygon = polygon;
-                            //FirstMouseClick = false;
                             PolygonDrawing = true;
                             if (CurrentLine != null)
                             {
                                 currentCanvas.Children.Remove(CurrentLine);
                             }
-                            CurrentLine = Draw.Edge(p, p, currentCanvas);
+                            CurrentLine = Draw.SimpleEdge(CurrentMousePosition, CurrentMousePosition, currentCanvas);
                         }
                         else
                         {
@@ -72,12 +71,13 @@ namespace GKProjekt1
                                 case PolygonDrawResult.DrawFinished:
                                     CurrentLine.X1 = p.X;
                                     CurrentLine.Y1 = p.Y;
-                                    PolygonDrawing = false;
+                                    
                                     Polygons.Add(PolygonNumber, CurrentlyDrawingPolygon);
 
-                                    PolygonNumber++;
-
+                                    currentCanvas.Children.Remove(CurrentLine);
+                                    PolygonDrawing = false;
                                     CurrentlyDrawingPolygon = null;
+                                    PolygonNumber++;
                                     break;
                                 case PolygonDrawResult.NotEnoughEdges:
                                     MessageBox.Show("Not enough edges to finish polygon", "Polygons", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -110,7 +110,8 @@ namespace GKProjekt1
         {
             Canvas currentCanvas = sender as Canvas;
 
-            Point p = e.GetPosition(currentCanvas);
+            Point CurrentMousePosition = e.GetPosition(currentCanvas);
+            //MyPoint p = new MyPoint(CurrentMousePosition.X, CurrentMousePosition.Y);
             //Debug.WriteLine($"MouseMove X:{p.X},Y:{p.Y} #{counter++}");
             switch (ProgramMode)
             {
@@ -119,16 +120,24 @@ namespace GKProjekt1
                     {
                         foreach(var pol in Polygons)
                         {
+                            var previousEdge = pol.Value.Edges.Last();
                             foreach(var edge in pol.Value.Edges)
                             {
                                 //check if point hit
-                                if (PointExtension.AreNear(edge.first, p, Globals.VerticleClickRadiusSize) == true)
+                                if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
                                 {
-                                    double X = p.X - (double)Globals.VerticleSize / 2.0;
-                                    double Y = p.Y - (double)Globals.VerticleSize / 2.0;
-                                    Canvas.SetLeft(edge.firstEllipse, X);
-                                    Canvas.SetTop(edge.firstEllipse, Y);
+                                    edge.first.Move(CurrentMousePosition.X, CurrentMousePosition.Y);
+                                    edge.MoveWithPoints();
+                                    previousEdge.MoveWithPoints();
                                 }
+                                //check if edge hit
+                                else if()
+                                {
+
+                                }
+
+
+                                previousEdge = edge;
                             }
                         }
                     }
@@ -138,8 +147,8 @@ namespace GKProjekt1
                     {
                         if (CurrentLine != null)
                         {
-                            CurrentLine.X2 = p.X;
-                            CurrentLine.Y2 = p.Y;
+                            CurrentLine.X2 = CurrentMousePosition.X;
+                            CurrentLine.Y2 = CurrentMousePosition.Y;
                         }
                     }
                     break;
