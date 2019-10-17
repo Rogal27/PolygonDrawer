@@ -119,8 +119,8 @@ namespace GKProjekt1
                             switch (DrawResult)
                             {
                                 case PolygonDrawResult.DrawFinished:
-                                    CurrentLine.X1 = p.X;
-                                    CurrentLine.Y1 = p.Y;
+                                    CurrentLine.X1 = CurrentMousePosition.X;
+                                    CurrentLine.Y1 = CurrentMousePosition.Y;
                                     
                                     Polygons.Add(PolygonNumber, CurrentlyDrawingPolygon);
 
@@ -133,8 +133,8 @@ namespace GKProjekt1
                                     MessageBox.Show("Not enough edges to finish polygon", "Polygons", MessageBoxButton.OK, MessageBoxImage.Warning);
                                     break;
                                 case PolygonDrawResult.DrawInProgress:
-                                    CurrentLine.X1 = p.X;
-                                    CurrentLine.Y1 = p.Y;
+                                    CurrentLine.X1 = CurrentMousePosition.X;
+                                    CurrentLine.Y1 = CurrentMousePosition.Y;
                                     break;
                                 default:
                                     break;
