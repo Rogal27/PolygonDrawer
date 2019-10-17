@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,7 +94,66 @@ namespace GKProjekt1
             List<MyEdge> ClearEdges = RemoveCollinearEdges();
             //TODO:
             //implement algorithm
-            return false;
+            //Debug.WriteLine($"Canvas actualwidth: {canvas.ActualWidth}");
+            //Debug.WriteLine($"Canvas width: {canvas.Width}");
+            MyEdge Ray = new MyEdge(new MyPoint(p.X, p.Y), new MyPoint(p.X + canvas.ActualWidth, p.Y));
+            int intersectCounter = 0;
+            var previousEdge = ClearEdges.Last();
+
+            for (int i = 0; i < ClearEdges.Count; i++)
+            {                
+                var edge = ClearEdges[i];
+                var nextEdge = ClearEdges[(i + 1) % ClearEdges.Count];
+                if (MyEdge.DoIntersect(edge, Ray) == true)
+                {
+                    var firstCollinear = MyPoint.CheckIfCollinear(Ray.first, edge.first, Ray.second);
+                    var secondCollinear = MyPoint.CheckIfCollinear(Ray.first, edge.second, Ray.second);
+
+                    if (firstCollinear == true && secondCollinear == true)
+                    {
+                        //if previosEdge.first i nextEdge.second leza
+                        //po przeciwnych stronach polprostej Ray to intersectCounter++
+                        if ((previousEdge.first.Y > Ray.first.Y && nextEdge.second.Y < Ray.first.Y) ||
+                            (previousEdge.first.Y < Ray.first.Y && nextEdge.second.Y > Ray.first.Y))
+                        {
+                            intersectCounter++;
+                        }
+                    }
+                    else if (firstCollinear == true)
+                    {
+                        //if previousEdge.first i edge.second leza
+                        //po przeciwnych stronach polprostej Ray to intersectCounter++
+                        //if (MyPoint.VectorProduct(previousEdge.first - edge.first, edge.second - edge.first) *
+                        //    MyPoint.VectorProduct(nextEdge.second - edge.first, edge.second - edge.first) < 0)
+                        //{
+                        //    intersectCounter++;
+
+                        if ((previousEdge.first.Y > Ray.first.Y && edge.second.Y < Ray.first.Y) ||
+                                (previousEdge.first.Y < Ray.first.Y && edge.second.Y > Ray.first.Y))
+                        {
+                            intersectCounter++;
+                        }
+                    }
+                    else if (secondCollinear == true)
+                    {
+                        //if edge.first i nextEdge.second leza
+                        //po przeciwnych stronach polprostej Ray to intersectCounter++
+                        if ((edge.first.Y > Ray.first.Y && nextEdge.second.Y < Ray.first.Y) ||
+                            (edge.first.Y < Ray.first.Y && nextEdge.second.Y > Ray.first.Y))
+                        {
+                            intersectCounter++;
+                        }
+                    }
+                    else
+                    {
+                        intersectCounter++;
+                    }
+                }
+                previousEdge = edge;                
+            }
+
+
+            return intersectCounter % 2 == 1;
         }
 
         private List<MyEdge> RemoveCollinearEdges()

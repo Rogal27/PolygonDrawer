@@ -87,12 +87,10 @@ namespace GKProjekt1
                                 }
                             }
                             //check if inside Polygon
-                            //if (false)
-                            //{
-                            //    ;
-                            //    return;
-                            //}
-                            pol.Value.IsPointInside(CurrentMousePosition);
+                            if (pol.Value.IsPointInside(CurrentMousePosition) == true)
+                            {
+                                Debug.WriteLine($"Hit: {pol.Key}");
+                            }
                         }
                         CurrentDragObject = DragObjectType.Nothing;
                     }

@@ -41,6 +41,24 @@ namespace GKProjekt1
             Y = p.Y;
             Canvas.SetLeft(ellipse, p.X - (double)Globals.VerticleSize / 2.0);
             Canvas.SetTop(ellipse, p.Y - (double)Globals.VerticleSize / 2.0);
+        } 
+
+        public static MyPoint operator -(MyPoint p1, MyPoint p2)
+        {
+            return new MyPoint(p1.X - p2.X, p1.Y - p2.Y);
+        }
+
+        public static double VectorProduct(MyPoint p1, MyPoint p2)
+        {
+            return p1.X * p2.Y - p2.X * p1.Y;
+        }
+
+        public static bool OnRectangle(MyPoint q, MyPoint p1, MyPoint p2)
+        {
+            return Math.Min(p1.X, p2.X) <= q.X &&
+                q.X <= Math.Max(p1.X, p2.X) &&
+                Math.Min(p1.Y, p2.Y) <= q.Y &&
+                q.Y <= Math.Max(p1.Y, p2.Y);
         }
 
         public static bool AreNear(MyPoint p1, MyPoint p2, double radius)

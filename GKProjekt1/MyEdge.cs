@@ -98,6 +98,28 @@ namespace GKProjekt1
             return false;
         }
 
+        public static bool DoIntersect(MyEdge e1, MyEdge e2)
+        {
+            var d1 = MyPoint.VectorProduct((e2.second - e2.first), (e1.first - e2.first));
+            var d2 = MyPoint.VectorProduct((e2.second - e2.first), (e1.second - e2.first));
+            var d3 = MyPoint.VectorProduct((e1.second - e1.first), (e2.first - e1.first));
+            var d4 = MyPoint.VectorProduct((e1.second - e1.first), (e2.second - e1.first));
+
+            var d12 = d1 * d2;
+            var d34 = d3 * d4;
+
+            if (d12 > 0 || d34 > 0)
+                return false;
+
+            if (d12 < 0 || d34 < 0)
+                return true;
+
+            return MyPoint.OnRectangle(e1.first, e2.first, e2.second) ||
+                MyPoint.OnRectangle(e1.second, e2.first, e2.second) ||
+                MyPoint.OnRectangle(e2.first, e1.first, e1.second) ||
+                MyPoint.OnRectangle(e2.second, e1.first, e1.second);
+        }
+
         public static bool operator ==(MyEdge e1, MyEdge e2)
         {
             if (e1.first == e2.first && e1.second == e2.second)
