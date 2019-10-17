@@ -77,6 +77,51 @@ namespace GKProjekt1
                 Edges.Add(e);
                 return PolygonDrawResult.DrawInProgress;
             }
+        }       
+
+        public void MoveVerticle(MyPoint verticle, Point endPoint)
+        {
+            var previousEdge = Edges.Last();
+            foreach (var edge in Edges)
+            {
+                if (Object.ReferenceEquals(edge.first, verticle) == true)
+                {
+                    verticle.Move(endPoint);
+                    edge.MoveWithPoints();
+                    previousEdge.MoveWithPoints();
+                    return;
+                }
+                previousEdge = edge;
+            }
+        }
+
+        public void MoveEdgeParallel(MyEdge edge, ref Point startPoint, ref Point endPoint)
+        {
+            var edgeIndex = Edges.IndexOf(edge);
+            if (edgeIndex == -1)
+                return;
+            int edgesCount = Edges.Count;
+            var previousEdge2 = Edges[(edgeIndex - 1 + edgesCount) % edgesCount];
+            var nextEdge2 = Edges[(edgeIndex + 1 + edgesCount) % edgesCount];
+            edge.MoveParallel(startPoint, endPoint);
+            startPoint = endPoint;
+            previousEdge2.MoveWithPoints();
+            nextEdge2.MoveWithPoints();
+        }
+
+        public void MovePolygon(ref Point startPoint, ref Point endPoint)
+        {
+            var offsetX = endPoint.X - startPoint.X;
+            var offsetY = endPoint.Y - startPoint.Y;
+            foreach (var edge in Edges)
+            {
+                edge.first.Move(edge.first.X + offsetX, edge.first.Y + offsetY);
+            }
+            foreach (var edge in Edges)
+            {
+                edge.MoveWithPoints();
+            }
+            startPoint = endPoint;
         }
 
         public bool IsPointInside(Point p)

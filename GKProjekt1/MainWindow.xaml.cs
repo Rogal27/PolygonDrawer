@@ -29,7 +29,7 @@ namespace GKProjekt1
 
         //Pointer Variables
         private bool IsDraggingOn = false;
-        private DragObjectType CurrentDragObject = DragObjectType.Nothing;
+        private DragObjectType CurrentDragObjectType = DragObjectType.Nothing;
         private Point DragStartingPoint = new Point();
         private int DragPolygonId = -1;
         private object DragObject = null;
@@ -65,7 +65,7 @@ namespace GKProjekt1
                                 //check if point hit
                                 if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
                                 {
-                                    CurrentDragObject = DragObjectType.Verticle;
+                                    CurrentDragObjectType = DragObjectType.Verticle;
                                     IsDraggingOn = true;
                                     DragPolygonId = pol.Key;
                                     DragObject = edge.first;
@@ -77,22 +77,27 @@ namespace GKProjekt1
                                 //check if edge hit
                                 if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
                                 {
-                                    CurrentDragObject = DragObjectType.Edge;
+                                    CurrentDragObjectType = DragObjectType.Edge;
                                     IsDraggingOn = true;
                                     DragPolygonId = pol.Key;
                                     DragObject = edge;
-                                    DragStartingPoint.X = CurrentMousePosition.X;
-                                    DragStartingPoint.Y = CurrentMousePosition.Y;
+                                    DragStartingPoint = CurrentMousePosition;
                                     return;
                                 }
                             }
                             //check if inside Polygon
                             if (pol.Value.IsPointInside(CurrentMousePosition) == true)
                             {
-                                Debug.WriteLine($"Hit: {pol.Key}");
+                                //Debug.WriteLine($"Hit: {pol.Key}");
+                                CurrentDragObjectType = DragObjectType.Polygon;
+                                IsDraggingOn = true;
+                                DragPolygonId = pol.Key;
+                                DragObject = pol.Value;
+                                DragStartingPoint = CurrentMousePosition;
+                                return;
                             }
                         }
-                        CurrentDragObject = DragObjectType.Nothing;
+                        CurrentDragObjectType = DragObjectType.Nothing;
                     }
                     break;
                 case Mode.Draw:
@@ -148,7 +153,7 @@ namespace GKProjekt1
         {
             if (ProgramMode == Mode.Pointer)
             {
-                CurrentDragObject = DragObjectType.Nothing;
+                CurrentDragObjectType = DragObjectType.Nothing;
                 IsDraggingOn = false;
                 DragPolygonId = -1;
                 DragObject = null;
@@ -165,42 +170,76 @@ namespace GKProjekt1
                 case Mode.Pointer://moving points and edges and polygons
                     if (IsDraggingOn == true)
                     {
-                        switch (CurrentDragObject)
+                        switch (CurrentDragObjectType)
                         {
                             case DragObjectType.Verticle:
                                 MyPoint verticle = DragObject as MyPoint;
-                                var previousEdge1 = Polygons[DragPolygonId].Edges.Last();
-                                foreach(var edge in Polygons[DragPolygonId].Edges)
-                                {
-                                    if (Object.ReferenceEquals(edge.first, verticle) == true)
-                                    {
-                                        verticle.Move(CurrentMousePosition);
-                                        edge.MoveWithPoints();
-                                        previousEdge1.MoveWithPoints();
-                                        return;
-                                    }
-                                    previousEdge1 = edge;
-                                }
+                                Polygons[DragPolygonId].MoveVerticle(verticle, CurrentMousePosition);
+                                //var previousEdge1 = Polygons[DragPolygonId].Edges.Last();
+                                //foreach(var edge in Polygons[DragPolygonId].Edges)
+                                //{
+                                //    if (Object.ReferenceEquals(edge.first, verticle) == true)
+                                //    {
+                                //        verticle.Move(CurrentMousePosition);
+                                //        edge.MoveWithPoints();
+                                //        previousEdge1.MoveWithPoints();
+                                //        return;
+                                //    }
+                                //    previousEdge1 = edge;
+                                //}
                                 break;
                             case DragObjectType.Edge:
                                 MyEdge movedEdge = DragObject as MyEdge;
-                                var edgeIndex = Polygons[DragPolygonId].Edges.IndexOf(movedEdge);
-                                int edgesCount = Polygons[DragPolygonId].Edges.Count;
-                                var previousEdge2 = Polygons[DragPolygonId].Edges[(edgeIndex - 1 + edgesCount) % edgesCount];
-                                var nextEdge2 = Polygons[DragPolygonId].Edges[(edgeIndex + 1 + edgesCount) % edgesCount];
-                                movedEdge.MoveParallel(DragStartingPoint, CurrentMousePosition);
-                                DragStartingPoint = CurrentMousePosition;
-                                previousEdge2.MoveWithPoints();
-                                nextEdge2.MoveWithPoints();                               
+                                Polygons[DragPolygonId].MoveEdgeParallel(movedEdge, ref DragStartingPoint, ref CurrentMousePosition);
+                                //var edgeIndex = Polygons[DragPolygonId].Edges.IndexOf(movedEdge);
+                                //int edgesCount = Polygons[DragPolygonId].Edges.Count;
+                                //var previousEdge2 = Polygons[DragPolygonId].Edges[(edgeIndex - 1 + edgesCount) % edgesCount];
+                                //var nextEdge2 = Polygons[DragPolygonId].Edges[(edgeIndex + 1 + edgesCount) % edgesCount];
+                                //movedEdge.MoveParallel(DragStartingPoint, CurrentMousePosition);
+                                //DragStartingPoint = CurrentMousePosition;
+                                //previousEdge2.MoveWithPoints();
+                                //nextEdge2.MoveWithPoints();
                                 break;
                             case DragObjectType.Polygon:
-                                //TODO
+                                Polygons[DragPolygonId].MovePolygon(ref DragStartingPoint, ref CurrentMousePosition);
                                 break;
                             case DragObjectType.Nothing:
+
                                 break;
                             default:
                                 break;
                         }
+                    }
+                    else
+                    {
+                        foreach (var pol in Polygons)
+                        {
+                            foreach (var edge in pol.Value.Edges)
+                            {
+                                //check if point hit
+                                if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
+                                {
+                                    currentCanvas.Cursor = Cursors.Hand;
+                                    return;
+                                }
+                            }
+                            foreach (var edge in pol.Value.Edges)
+                            {
+                                //check if edge hit
+                                if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                {
+                                    currentCanvas.Cursor = Cursors.Hand;
+                                    return;
+                                }
+                            }
+                            //check if inside Polygon
+                            if (pol.Value.IsPointInside(CurrentMousePosition) == true)
+                            {
+                                currentCanvas.Cursor = Cursors.SizeAll;
+                                return;
+                            }
+                        }
+                        currentCanvas.Cursor = Cursors.Arrow;
                     }
                     break;
                 case Mode.Draw:
