@@ -7,27 +7,65 @@
         mc:Ignorable="d"
         Title="Polygons" Height="720" Width="1280" MinHeight="720" MinWidth="1280">
     <Window.Resources>
-        <Style x:Key="ModeButton" TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="Width" Value="100"/>
+        <Style x:Key="GeneratePolygonButton" TargetType="Button">
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="Width" Value="auto"/>
             <Setter Property="Margin" Value="10,10,10,10"/>
             <Setter Property="Padding" Value="10,10,10,10"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
+        <Style x:Key="ClearAllButton" TargetType="Button">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="auto"/>
+            <Setter Property="Margin" Value="15"/>
+            <Setter Property="Padding" Value="10,10,10,10"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="ModeButton" TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Margin" Value="10,10,10,10"/>
+            <Setter Property="Padding" Value="10,10,10,10"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="GroupName" Value="Radio"/>
+        </Style>
+        <Style x:Key="StackPanelModeButton" TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="140"/>
+            <Setter Property="Margin" Value="5,7,5,3"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="GroupName" Value="Radio"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="80"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <WrapPanel VerticalAlignment="Center" Background="LightGray">
-            <RadioButton Name="PointerButton" Style="{StaticResource ModeButton}" Content="Mouse Pointer" IsChecked="True" Click="PointerMode_Click"/>
-            <RadioButton Name="DrawButton" Style="{StaticResource ModeButton}" Content="Draw" Click="DrawMode_Click"/>
-            <RadioButton Style="{StaticResource ModeButton}" Content="Add Equality"/>
-            <RadioButton Style="{StaticResource ModeButton}" Width="auto" Content="Add Perpendicular"/>
-            <RadioButton Style="{StaticResource ModeButton}" Content="Delete"/>
-            <RadioButton Style="{StaticResource ModeButton}" Width="auto" Content="Generate Sample Polygon"/>
-        </WrapPanel>
+        <Grid Background="LightGray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <WrapPanel VerticalAlignment="Center">
+                <RadioButton Name="PointerButton" Style="{StaticResource ModeButton}" Content="Mouse Pointer" IsChecked="True" Click="PointerMode_Click"/>
+                <RadioButton Name="DrawButton" Style="{StaticResource ModeButton}" Content="Draw" Click="DrawMode_Click"/>
+                <StackPanel>
+                    <RadioButton Style="{StaticResource StackPanelModeButton}" Content="Add Equality" Click="AddEqualRelationMode_Click"/>
+                    <RadioButton Style="{StaticResource StackPanelModeButton}" Margin="5,3,5,7"  Content="Delete Equality" Click="DeleteEqualRelationMode_Click"/>
+                </StackPanel>
+                <StackPanel>
+                    <RadioButton Style="{StaticResource StackPanelModeButton}" Content="Add Perpendicular" Click="AddPerpendicularRelationMode_Click"/>
+                    <RadioButton Style="{StaticResource StackPanelModeButton}" Margin="5,3,5,7" Content="Delete Perpendicular" Click="DeletePerpendicularRelationMode_Click"/>
+                </StackPanel>
+                <RadioButton Style="{StaticResource ModeButton}" Width="auto" Content="Add Middle Verticle" Click="AddMiddleVerticleMode_Click"/>
+                <RadioButton Style="{StaticResource ModeButton}" Content="Delete Verticle" Click="DeleteMode_Click"/>                
+            </WrapPanel>
+            <Button Grid.Column="1" Style="{StaticResource GeneratePolygonButton}" Content="Generate Sample Polygon"/>
+            <Button Grid.Column="2" Style="{StaticResource ClearAllButton}" Content="Clear All"/>
+        </Grid>
         <Canvas Grid.Row="1" Name="PolygonCanvas" Background="White" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="PolygonCanvas_MouseMove" MouseLeftButtonUp="Canvas_MouseLeftButtonUp" >
         </Canvas>
     </Grid>

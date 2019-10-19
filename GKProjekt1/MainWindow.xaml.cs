@@ -34,13 +34,15 @@ namespace GKProjekt1
         private int DragPolygonId = -1;
         private object DragObject = null;
 
-        //Drawing variables
+        //Drawing Variables
         private bool PolygonDrawing = false;
         private MyPolygon CurrentlyDrawingPolygon = null;
         private int PolygonNumber = 0;
         private Line CurrentLine = null;
 
-        //private double counter = 0.0;
+        //Adding Relation Variables
+        private int RelationPolygonId = -1;
+        private MyEdge RelationSelectedEdge = null;
 
         
         public MainWindow()
@@ -143,6 +145,86 @@ namespace GKProjekt1
                         }
                     }
                     break;
+                case Mode.AddMiddleVerticle:
+                    {
+                        foreach (var pol in Polygons)
+                        {
+                            foreach (var edge in pol.Value.Edges)
+                            {
+                                //check if edge hit
+                                if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                {
+                                    pol.Value.AddMiddleVerticleOnEdge(edge);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case Mode.AddEqualRelation:
+                case Mode.AddPerpendicularRelation:
+                    {
+                        RelationType relationType;
+                        if (ProgramMode == Mode.AddEqualRelation)
+                        {
+                            relationType = RelationType.Equal;
+                        }
+                        else
+                        {
+                            relationType = RelationType.Perpendicular;
+                        }
+                        if (RelationPolygonId == -1)
+                        {
+                            foreach (var pol in Polygons)
+                            {
+                                foreach (var edge in pol.Value.Edges)
+                                {
+                                    //check if edge hit
+                                    if (edge.relationType == RelationType.None)
+                                    {
+                                        if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                        {
+                                            edge.SelectEdge();
+                                            RelationSelectedEdge = edge;
+                                            RelationPolygonId = pol.Key;
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (var edge in Polygons[RelationPolygonId].Edges)
+                            {
+                                //check if edge hit
+                                if (edge.relationType == RelationType.None)
+                                {
+                                    if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                    {                                        
+                                        if (Object.ReferenceEquals(edge, RelationSelectedEdge) == false)
+                                        {
+                                            edge.relationIcon = new RelationIcon(edge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
+                                            RelationSelectedEdge.relationIcon = new RelationIcon(edge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
+                                            edge.relationType = relationType;
+                                            RelationSelectedEdge.relationType = relationType;
+                                            edge.relationEdge = RelationSelectedEdge;
+                                            RelationSelectedEdge.relationEdge = edge;                                            
+                                        }
+                                        RelationSelectedEdge.UnselectEdge();
+                                        RelationSelectedEdge = null;
+                                        RelationPolygonId = -1;
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case Mode.DeleteEqualRelation:
+                    break;
+                case Mode.DeletePerpendicularRelation:
+                    break;
                 default:
                     break;
             }
@@ -168,61 +250,77 @@ namespace GKProjekt1
             switch (ProgramMode)
             {
                 case Mode.Pointer://moving points and edges and polygons
-                    if (IsDraggingOn == true)
                     {
-                        switch (CurrentDragObjectType)
+                        if (IsDraggingOn == true)
                         {
-                            case DragObjectType.Verticle:
-                                MyPoint verticle = DragObject as MyPoint;
-                                Polygons[DragPolygonId].MoveVerticle(verticle, CurrentMousePosition);
-                                //var previousEdge1 = Polygons[DragPolygonId].Edges.Last();
-                                //foreach(var edge in Polygons[DragPolygonId].Edges)
-                                //{
-                                //    if (Object.ReferenceEquals(edge.first, verticle) == true)
-                                //    {
-                                //        verticle.Move(CurrentMousePosition);
-                                //        edge.MoveWithPoints();
-                                //        previousEdge1.MoveWithPoints();
-                                //        return;
-                                //    }
-                                //    previousEdge1 = edge;
-                                //}
-                                break;
-                            case DragObjectType.Edge:
-                                MyEdge movedEdge = DragObject as MyEdge;
-                                Polygons[DragPolygonId].MoveEdgeParallel(movedEdge, ref DragStartingPoint, ref CurrentMousePosition);
-                                //var edgeIndex = Polygons[DragPolygonId].Edges.IndexOf(movedEdge);
-                                //int edgesCount = Polygons[DragPolygonId].Edges.Count;
-                                //var previousEdge2 = Polygons[DragPolygonId].Edges[(edgeIndex - 1 + edgesCount) % edgesCount];
-                                //var nextEdge2 = Polygons[DragPolygonId].Edges[(edgeIndex + 1 + edgesCount) % edgesCount];
-                                //movedEdge.MoveParallel(DragStartingPoint, CurrentMousePosition);
-                                //DragStartingPoint = CurrentMousePosition;
-                                //previousEdge2.MoveWithPoints();
-                                //nextEdge2.MoveWithPoints();
-                                break;
-                            case DragObjectType.Polygon:
-                                Polygons[DragPolygonId].MovePolygon(ref DragStartingPoint, ref CurrentMousePosition);
-                                break;
-                            case DragObjectType.Nothing:
-
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        foreach (var pol in Polygons)
-                        {
-                            foreach (var edge in pol.Value.Edges)
+                            switch (CurrentDragObjectType)
                             {
-                                //check if point hit
-                                if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
+                                case DragObjectType.Verticle:
+                                    MyPoint verticle = DragObject as MyPoint;
+                                    Polygons[DragPolygonId].MoveVerticle(verticle, CurrentMousePosition);
+                                    break;
+                                case DragObjectType.Edge:
+                                    MyEdge movedEdge = DragObject as MyEdge;
+                                    Polygons[DragPolygonId].MoveEdgeParallel(movedEdge, ref DragStartingPoint, ref CurrentMousePosition);
+                                    break;
+                                case DragObjectType.Polygon:
+                                    Polygons[DragPolygonId].MovePolygon(ref DragStartingPoint, ref CurrentMousePosition);
+                                    break;
+                                case DragObjectType.Nothing:
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            foreach (var pol in Polygons)
+                            {
+                                foreach (var edge in pol.Value.Edges)
                                 {
-                                    currentCanvas.Cursor = Cursors.Hand;
+                                    //check if point hit
+                                    if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
+                                    {
+                                        currentCanvas.Cursor = Cursors.Hand;
+                                        return;
+                                    }
+                                }
+                                foreach (var edge in pol.Value.Edges)
+                                {
+                                    //check if edge hit
+                                    if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                    {
+                                        currentCanvas.Cursor = Cursors.Hand;
+                                        return;
+                                    }
+                                }
+                                //check if inside Polygon
+                                if (pol.Value.IsPointInside(CurrentMousePosition) == true)
+                                {
+                                    currentCanvas.Cursor = Cursors.SizeAll;
                                     return;
                                 }
                             }
+                            currentCanvas.Cursor = Cursors.Arrow;
+                        }
+                    }
+                    break;
+                case Mode.Draw:
+                    {
+                        if (PolygonDrawing == true)
+                        {
+                            if (CurrentLine != null)
+                            {
+                                CurrentLine.X2 = CurrentMousePosition.X;
+                                CurrentLine.Y2 = CurrentMousePosition.Y;
+                            }
+                        }
+                    }
+                    break;
+                case Mode.AddMiddleVerticle:
+                    {
+                        foreach (var pol in Polygons)
+                        {
                             foreach (var edge in pol.Value.Edges)
                             {
                                 //check if edge hit
@@ -232,25 +330,11 @@ namespace GKProjekt1
                                     return;
                                 }
                             }
-                            //check if inside Polygon
-                            if (pol.Value.IsPointInside(CurrentMousePosition) == true)
-                            {
-                                currentCanvas.Cursor = Cursors.SizeAll;
-                                return;
-                            }
                         }
                         currentCanvas.Cursor = Cursors.Arrow;
                     }
                     break;
-                case Mode.Draw:
-                    if (PolygonDrawing == true)
-                    {
-                        if (CurrentLine != null)
-                        {
-                            CurrentLine.X2 = CurrentMousePosition.X;
-                            CurrentLine.Y2 = CurrentMousePosition.Y;
-                        }
-                    }
+                default:
                     break;
             }            
         }
@@ -281,22 +365,60 @@ namespace GKProjekt1
             return true;
         }
 
-        private void PointerMode_Click(object sender, RoutedEventArgs e)
+        private bool DoesUserWantToChangeMode(object sender)
         {
-            if (ClearUnfinishedPolygon() == true)
+            if (ProgramMode == Mode.Draw)
             {
-                ProgramMode = Mode.Pointer;
+                if (ClearUnfinishedPolygon() == false)
+                {
+                    var button = sender as RadioButton;
+                    button.IsChecked = false;
+                    DrawButton.IsChecked = true;
+                    return false;
+                }
             }
-            else
-            {
-                PointerButton.IsChecked = false;
-                DrawButton.IsChecked = true;
-            }
+            //Add clearing after adding relations
+            return true;
         }
 
+        private void PointerMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (DoesUserWantToChangeMode(sender) == true)
+                ProgramMode = Mode.Pointer;
+        }
         private void DrawMode_Click(object sender, RoutedEventArgs e)
         {
             ProgramMode = Mode.Draw;
+        }
+        private void DeleteMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (DoesUserWantToChangeMode(sender) == true)
+                ProgramMode = Mode.DeleteVerticle;
+        }
+        private void AddMiddleVerticleMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (DoesUserWantToChangeMode(sender) == true)
+                ProgramMode = Mode.AddMiddleVerticle;
+        }
+        private void AddEqualRelationMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (DoesUserWantToChangeMode(sender) == true)
+                ProgramMode = Mode.AddEqualRelation;
+        }
+        private void DeleteEqualRelationMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (DoesUserWantToChangeMode(sender) == true)
+                ProgramMode = Mode.DeleteEqualRelation;
+        }
+        private void AddPerpendicularRelationMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (DoesUserWantToChangeMode(sender) == true)
+                ProgramMode = Mode.AddPerpendicularRelation;
+        }
+        private void DeletePerpendicularRelationMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (DoesUserWantToChangeMode(sender) == true)
+                ProgramMode = Mode.DeletePerpendicularRelation;
         }
     }
 }

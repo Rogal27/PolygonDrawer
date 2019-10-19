@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 
 namespace GKProjekt1
@@ -14,8 +16,9 @@ namespace GKProjekt1
         public MyPoint first { get; set; }
         public MyPoint second { get; set; }
         public Line line { get; set; }
-        //public Ellipse firstEllipse { get; set; }
-        //public Ellipse secondEllipse { get; set; }
+        public RelationIcon relationIcon { get; set; }
+        public RelationType relationType { get; set; } = RelationType.None;
+        public MyEdge relationEdge { get; set; }
 
         public MyEdge(MyPoint first, MyPoint second)
         {
@@ -27,11 +30,10 @@ namespace GKProjekt1
         {
             this.first = first;
             this.second = second;
-            //this.firstEllipse = firstEllipse;
-            //this.secondEllipse = secondEllipse;
             this.line = line;
         }
 
+        //BRESENHAM!
         public void MoveWithPoints()
         {
             line.X1 = first.X;
@@ -40,37 +42,9 @@ namespace GKProjekt1
             line.Y2 = second.Y;
         }
 
-        //private Point FindClosestPointOnEdge(Point p)
-        //{
-        //    Point EdgePoint = new Point();
-        //    (double, double) vectorAP = (p.X - first.X, p.Y - first.Y);       //Vector from A to P   
-        //    (double, double) vectorAB = (second.X - first.X, second.Y - first.Y);       //Vector from A to B  
-        //    double magnitudeAB = vectorAB.Item1 * vectorAB.Item1 + vectorAB.Item2 * vectorAB.Item2;   //Magnitude of AB vector (it's length squared)     
-        //    double ABAPproduct = vectorAB.Item1 * vectorAP.Item1 + vectorAB.Item2 + vectorAP.Item2;    //The DOT product of a_to_p and a_to_b     
-        //    double distance = ABAPproduct / magnitudeAB; //The normalized "distance" from a to your closest point  
-        //    if (distance < 0)     //Check if P projection is over vectorAB    
-        //    {
-        //        EdgePoint.X = first.X;
-        //        EdgePoint.Y = first.Y;
-        //    }
-        //    else if (distance > 1)
-        //    {
-        //        EdgePoint.X = second.X;
-        //        EdgePoint.Y = second.Y;
-        //    }
-        //    else
-        //    {
-        //        EdgePoint.X = first.X + vectorAB.Item1 * distance;
-        //        EdgePoint.Y = first.Y + vectorAB.Item2 * distance;
-        //    }
-        //    return EdgePoint;
-        //}
-
+        //BRESENHAM!
         public void MoveParallel(Point startPoint, Point endPoint)
         {
-            //Point offset = FindClosestPointOnEdge(p);
-            //MyPoint point = new MyPoint(offset.X, offset.Y);
-            //Draw.Verticle(point, canvas);
             var x = endPoint.X - startPoint.X;
             var y = endPoint.Y - startPoint.Y;
             first.Move(first.X + x, first.Y + y);
@@ -118,6 +92,33 @@ namespace GKProjekt1
                 MyPoint.OnRectangle(e1.second, e2.first, e2.second) ||
                 MyPoint.OnRectangle(e2.first, e1.first, e1.second) ||
                 MyPoint.OnRectangle(e2.second, e1.first, e1.second);
+        }
+
+        public double Length()
+        {
+            double x = first.X - second.X;
+            double y = first.Y - second.Y;
+            return Math.Sqrt(x * x + y * y);
+        }
+
+        //BRESENHAM!
+        public void SelectEdge()
+        {
+            var effect = new DropShadowEffect();
+            effect.BlurRadius = Globals.SelectedEdgeBlurRadius;
+            effect.Color = Globals.SelectedEdgeColor;
+            effect.Direction = 0;
+            effect.ShadowDepth = 0;
+            effect.Opacity = 0.9;
+            line.Stroke = new SolidColorBrush(Globals.SelectedEdgeColor);
+            line.Effect = effect;
+        }
+
+        //BRESENHAM!
+        public void UnselectEdge()
+        {
+            line.Stroke = new SolidColorBrush(Globals.DefaultEdgeColor);
+            line.Effect = null;
         }
 
         public static bool operator ==(MyEdge e1, MyEdge e2)
