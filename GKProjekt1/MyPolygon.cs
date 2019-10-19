@@ -68,6 +68,60 @@ namespace GKProjekt1
             }
         }
 
+        //BRESENHAM
+        public bool DeleteVerticle(MyPoint verticle)
+        {
+            if (Edges.Count > 3)
+            {
+                var previousEdge = Edges.Last();
+                foreach (var edge in Edges)
+                {
+                    if (Object.ReferenceEquals(edge.first, verticle) == true)
+                    {
+                        previousEdge.DeleteRelation();
+                        edge.DeleteRelation();
+
+                        previousEdge.second = edge.second;
+                        previousEdge.MoveWithPoints();
+
+                        canvas.Children.Remove(edge.first.ellipse);
+                        canvas.Children.Remove(edge.line);
+
+                        Edges.Remove(edge);
+
+                        return false;
+                    }
+                    previousEdge = edge;
+                }
+            }
+            else
+            {
+                var result = MessageBox.Show("Do you want to delete polygon?", Globals.WindowName, MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    DeleteDrawing();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        //BRESENHAM!
+        public void AddMiddleVerticleOnEdge(MyEdge edge)
+        {
+            edge.DeleteRelation();
+            var index = Edges.IndexOf(edge);
+            var middleX = (edge.first.X + edge.second.X) / 2.0;
+            var middleY = (edge.first.Y + edge.second.Y) / 2.0;
+            MyPoint middleVerticle = new MyPoint(middleX, middleY);
+            Draw.Verticle(middleVerticle, canvas);
+            MyEdge secondHalf = new MyEdge(middleVerticle, edge.second);
+            Draw.Edge(secondHalf, canvas);
+            edge.second = middleVerticle;
+            edge.MoveWithPoints();
+            Edges.Insert(index + 1, secondHalf);
+        }
+
         //BRESENHAM!
         public void MoveEdgeParallel(MyEdge edge, ref Point startPoint, ref Point endPoint)
         {
@@ -118,10 +172,11 @@ namespace GKProjekt1
             //Debug.WriteLine($"Canvas width: {canvas.Width}");
             MyEdge Ray = new MyEdge(new MyPoint(p.X, p.Y), new MyPoint(p.X + canvas.ActualWidth, p.Y));
             int intersectCounter = 0;
-            var previousEdge = ClearEdges.Last();
+            //var previousEdge = ClearEdges.Last();
 
             for (int i = 0; i < ClearEdges.Count; i++)
             {
+                var previousEdge = ClearEdges[(i - 1 + ClearEdges.Count) % ClearEdges.Count];
                 var edge = ClearEdges[i];
                 var nextEdge = ClearEdges[(i + 1) % ClearEdges.Count];
                 if (MyEdge.DoIntersect(edge, Ray) == true)
@@ -143,15 +198,11 @@ namespace GKProjekt1
                     {
                         //if previousEdge.first i edge.second leza
                         //po przeciwnych stronach polprostej Ray to intersectCounter++
-                        //if (MyPoint.VectorProduct(previousEdge.first - edge.first, edge.second - edge.first) *
-                        //    MyPoint.VectorProduct(nextEdge.second - edge.first, edge.second - edge.first) < 0)
-                        //{
-                        //    intersectCounter++;
-
                         if ((previousEdge.first.Y > Ray.first.Y && edge.second.Y < Ray.first.Y) ||
                                 (previousEdge.first.Y < Ray.first.Y && edge.second.Y > Ray.first.Y))
                         {
                             intersectCounter++;
+                            i++;
                         }
                     }
                     else if (secondCollinear == true)
@@ -162,6 +213,7 @@ namespace GKProjekt1
                             (edge.first.Y < Ray.first.Y && nextEdge.second.Y > Ray.first.Y))
                         {
                             intersectCounter++;
+                            i++;
                         }
                     }
                     else
@@ -172,22 +224,7 @@ namespace GKProjekt1
                 previousEdge = edge;
             }
             return intersectCounter % 2 == 1;
-        }
-
-        //BRESENHAM!
-        public void AddMiddleVerticleOnEdge(MyEdge edge)
-        {
-            var index = Edges.IndexOf(edge);
-            var middleX = (edge.first.X + edge.second.X) / 2.0;
-            var middleY = (edge.first.Y + edge.second.Y) / 2.0;
-            MyPoint middleVerticle = new MyPoint(middleX, middleY);
-            Draw.Verticle(middleVerticle, canvas);            
-            MyEdge secondHalf = new MyEdge(middleVerticle, edge.second);
-            Draw.Edge(secondHalf, canvas);
-            edge.second = middleVerticle;
-            edge.MoveWithPoints();
-            Edges.Insert(index + 1, secondHalf);
-        }
+        }       
 
         private List<MyEdge> RemoveCollinearEdges()
         {
@@ -233,6 +270,7 @@ namespace GKProjekt1
         {
             foreach(var edge in Edges)
             {
+                edge.DeleteRelation();
                 canvas.Children.Remove(edge.line);
                 canvas.Children.Remove(edge.first.ellipse);
                 canvas.Children.Remove(edge.second.ellipse);

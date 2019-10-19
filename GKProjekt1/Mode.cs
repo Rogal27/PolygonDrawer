@@ -10,11 +10,9 @@ namespace GKProjekt1
     {
         Pointer,
         Draw,
-        DeleteVerticle,
+        DeleteVerticleOrRelation,
         AddMiddleVerticle,
         AddEqualRelation,
-        DeleteEqualRelation,
-        AddPerpendicularRelation,
-        DeletePerpendicularRelation
+        AddPerpendicularRelation
     }
 }

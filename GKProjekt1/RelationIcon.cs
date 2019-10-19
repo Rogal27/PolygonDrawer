@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -15,15 +16,15 @@ namespace GKProjekt1
         
         public RelationType relation { get; }
 
-        MyEdge edge { get; set; }
+        public MyEdge edge { get; set; }
 
-        public Canvas canvas { get; set; }
+        public MyPolygon polygon { get; set; }
 
         public Image image { get; set; }
 
         public TextBlock text { get; set; }
 
-        public RelationIcon(MyEdge edge, RelationType relation, int PolygonId, MyPolygon polygon, Canvas canvas)
+        public RelationIcon(MyEdge _edge, RelationType _relation, int PolygonId, MyPolygon _polygon, Canvas _canvas)
         {
             if (relation != RelationType.None)
             {
@@ -32,9 +33,10 @@ namespace GKProjekt1
                     RelationCounter[PolygonId] = (0, 0);
                 }
 
-                this.edge = edge;
-                this.canvas = canvas;
-                this.relation = relation;
+                this.edge = _edge;
+                this.relation = _relation;
+                this.polygon = _polygon;
+                edge.relationType = relation;
                 image = new Image();
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
@@ -49,24 +51,7 @@ namespace GKProjekt1
                 bitmap.EndInit();
                 image.Source = bitmap;
                 image.Width = Globals.BitmapSize;
-                image.Height = Globals.BitmapSize;
-
-                var middleX = (edge.first.X + edge.second.X) / 2.0 - (double)Globals.BitmapSize / 2.0;
-                var middleY = (edge.first.Y + edge.second.Y) / 2.0 - (double)Globals.BitmapSize / 2.0;
-
-                var vectorX = edge.second.Y - edge.first.Y;
-                var vectorY = edge.first.X - edge.second.X;
-
-                var newMiddleX = middleX + vectorX * Globals.ImagePositionScale / edge.Length();
-                var newMiddleY = middleY + vectorY * Globals.ImagePositionScale / edge.Length();
-
-                if (polygon.IsPointInside(new System.Windows.Point(newMiddleX, newMiddleY)) == true)
-                {
-                    vectorX *= -1.0;
-                    vectorY *= -1.0;
-                    newMiddleX = middleX + vectorX * Globals.ImagePositionScale / edge.Length();
-                    newMiddleY = middleY + vectorY * Globals.ImagePositionScale / edge.Length();
-                }
+                image.Height = Globals.BitmapSize;                
 
                 text = new TextBlock();
                 text.Foreground = new SolidColorBrush(Globals.RelationFontColor);
@@ -82,17 +67,59 @@ namespace GKProjekt1
                     RelationCounter[PolygonId] = (RelationCounter[PolygonId].EqualCounter, RelationCounter[PolygonId].PerpendicularCounter + 1);
                 }
 
-                Canvas.SetLeft(image, newMiddleX);
-                Canvas.SetTop(image, newMiddleY);
+                var points = CalculatePoints();
 
-                Canvas.SetLeft(text, newMiddleX+Globals.BitmapSize);
-                Canvas.SetTop(text, newMiddleY + (Globals.BitmapSize - Globals.RelationFontSize) / 1.5);
+                Canvas.SetLeft(image, points.imagePoint.X);
+                Canvas.SetTop(image, points.imagePoint.Y);
+
+                Canvas.SetLeft(text, points.textPoint.X);
+                Canvas.SetTop(text, points.textPoint.Y);
 
                 Panel.SetZIndex(image, Globals.ImageZIndex);
                 Panel.SetZIndex(text, Globals.ImageZIndex);
-                canvas.Children.Add(image);
-                canvas.Children.Add(text);
+                polygon.canvas.Children.Add(image);
+                polygon.canvas.Children.Add(text);
             }
+        }
+
+        public void MoveIcon()
+        {
+            var points = CalculatePoints();
+            Canvas.SetLeft(image, points.imagePoint.X);
+            Canvas.SetTop(image, points.imagePoint.Y);
+
+            Canvas.SetLeft(text, points.textPoint.X);
+            Canvas.SetTop(text, points.textPoint.Y);
+        }
+
+        public void Delete()
+        {
+            polygon.canvas.Children.Remove(image);
+            polygon.canvas.Children.Remove(text);
+        }
+
+        private (Point imagePoint, Point textPoint) CalculatePoints()
+        {
+            double middleX = (edge.first.X + edge.second.X) / 2.0 - (double)Globals.BitmapSize / 2.0;
+            double middleY = (edge.first.Y + edge.second.Y) / 2.0 - (double)Globals.BitmapSize / 2.0;
+
+            double vectorX = edge.second.Y - edge.first.Y;
+            double vectorY = edge.first.X - edge.second.X;
+
+            double newMiddleX = middleX + vectorX * Globals.ImagePositionScale / edge.Length();
+            double newMiddleY = middleY + vectorY * Globals.ImagePositionScale / edge.Length();
+
+            if (polygon.IsPointInside(new Point(newMiddleX, newMiddleY)) == true)
+            {
+                vectorX *= -1.0;
+                vectorY *= -1.0;
+                newMiddleX = middleX + vectorX * Globals.ImagePositionScale / edge.Length();
+                newMiddleY = middleY + vectorY * Globals.ImagePositionScale / edge.Length();
+            }
+
+            Point imagePoint = new Point(newMiddleX, newMiddleY);
+            Point textPoint = new Point(newMiddleX + Globals.BitmapSize, newMiddleY + (Globals.BitmapSize - Globals.RelationFontSize) / 1.5);
+            return (imagePoint, textPoint);
         }
     }
 }

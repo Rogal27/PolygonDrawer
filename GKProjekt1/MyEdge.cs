@@ -16,9 +16,9 @@ namespace GKProjekt1
         public MyPoint first { get; set; }
         public MyPoint second { get; set; }
         public Line line { get; set; }
-        public RelationIcon relationIcon { get; set; }
+        public RelationIcon relationIcon { get; set; } = null;
         public RelationType relationType { get; set; } = RelationType.None;
-        public MyEdge relationEdge { get; set; }
+        public MyEdge relationEdge { get; set; } = null;
 
         public MyEdge(MyPoint first, MyPoint second)
         {
@@ -40,6 +40,7 @@ namespace GKProjekt1
             line.Y1 = first.Y;
             line.X2 = second.X;
             line.Y2 = second.Y;
+            relationIcon?.MoveIcon();
         }
 
         //BRESENHAM!
@@ -119,6 +120,21 @@ namespace GKProjekt1
         {
             line.Stroke = new SolidColorBrush(Globals.DefaultEdgeColor);
             line.Effect = null;
+        }
+
+        public void DeleteRelation()
+        {
+            if (relationType != RelationType.None)
+            {
+                relationIcon.Delete();
+                relationIcon = null;
+                relationEdge.relationIcon.Delete();
+                relationEdge.relationIcon = null;
+                relationType = RelationType.None;
+                relationEdge.relationType = RelationType.None;
+                relationEdge.relationEdge = null;
+                relationEdge = null;
+            }
         }
 
         public static bool operator ==(MyEdge e1, MyEdge e2)

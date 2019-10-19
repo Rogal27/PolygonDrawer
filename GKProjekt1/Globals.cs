@@ -10,6 +10,7 @@ namespace GKProjekt1
     public static class Globals
     {
         public static bool __Test__ = true;
+        public static string WindowName = "Polygons";
         //colors
         public static Color DefaultVerticleColor = Color.FromRgb(70, 73, 235);
         public static Color DefaultEdgeColor = Color.FromRgb(0, 0, 0);
