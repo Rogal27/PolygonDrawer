@@ -21,7 +21,7 @@ namespace GKProjekt1
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Mode ProgramMode { get; set; }
+        public Mode ProgramMode { get; set; } = Mode.Pointer;
 
         private Dictionary<int, MyPolygon> Polygons = new Dictionary<int, MyPolygon>();
 
@@ -132,7 +132,7 @@ namespace GKProjekt1
                                     PolygonNumber++;
                                     break;
                                 case PolygonDrawResult.NotEnoughEdges:
-                                    MessageBox.Show("Not enough edges to finish polygon", "Polygons", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                    MessageBox.Show("Not enough edges to finish polygon", Globals.WindowName, MessageBoxButton.OK, MessageBoxImage.Warning);
                                     break;
                                 case PolygonDrawResult.DrawInProgress:
                                     CurrentLine.X1 = CurrentMousePosition.X;
@@ -205,9 +205,7 @@ namespace GKProjekt1
                                         if (Object.ReferenceEquals(edge, RelationSelectedEdge) == false)
                                         {
                                             edge.relationIcon = new RelationIcon(edge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
-                                            RelationSelectedEdge.relationIcon = new RelationIcon(edge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
-                                            edge.relationType = relationType;
-                                            RelationSelectedEdge.relationType = relationType;
+                                            RelationSelectedEdge.relationIcon = new RelationIcon(RelationSelectedEdge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
                                             edge.relationEdge = RelationSelectedEdge;
                                             RelationSelectedEdge.relationEdge = edge;                                            
                                         }
@@ -221,9 +219,34 @@ namespace GKProjekt1
                         }
                     }
                     break;
-                case Mode.DeleteEqualRelation:
-                    break;
-                case Mode.DeletePerpendicularRelation:
+                case Mode.DeleteVerticleOrRelation:
+                    {
+                        foreach (var pol in Polygons)
+                        {
+                            foreach (var edge in pol.Value.Edges)
+                            {
+                                //check if point hit
+                                if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
+                                {
+                                    if (Polygons[pol.Key].DeleteVerticle(edge.first) == true)
+                                    {
+                                        Polygons[pol.Key] = null;
+                                        Polygons.Remove(pol.Key);
+                                    }
+                                    return;
+                                }
+                            }
+                            foreach (var edge in pol.Value.Edges)
+                            {
+                                //check if edge hit
+                                if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                {
+                                    edge.DeleteRelation();
+                                    return;
+                                }
+                            }
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -317,7 +340,7 @@ namespace GKProjekt1
                         }
                     }
                     break;
-                case Mode.AddMiddleVerticle:
+                case Mode.AddMiddleVerticle:    
                     {
                         foreach (var pol in Polygons)
                         {
@@ -325,6 +348,68 @@ namespace GKProjekt1
                             {
                                 //check if edge hit
                                 if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                {
+                                    currentCanvas.Cursor = Cursors.Hand;
+                                    return;
+                                }
+                            }
+                        }
+                        currentCanvas.Cursor = Cursors.Arrow;
+                    }
+                    break;
+                case Mode.AddEqualRelation:
+                case Mode.AddPerpendicularRelation:
+                    {
+                        if (RelationPolygonId == -1)
+                        {
+                            foreach (var pol in Polygons)
+                            {
+                                foreach (var edge in pol.Value.Edges)
+                                {
+                                    //check if edge hit
+                                    if (edge.relationType == RelationType.None && edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                    {
+                                        currentCanvas.Cursor = Cursors.Hand;
+                                        return;
+                                    }
+                                }
+                            }                            
+                        }
+                        else
+                        {
+                            foreach (var edge in Polygons[RelationPolygonId].Edges)
+                            {
+                                //check if edge hit
+                                if (edge.relationType == RelationType.None || Object.ReferenceEquals(edge, RelationSelectedEdge) == true)
+                                {
+                                    if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
+                                    {
+                                        currentCanvas.Cursor = Cursors.Hand;
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        currentCanvas.Cursor = Cursors.Arrow;
+                    }
+                    break;
+                case Mode.DeleteVerticleOrRelation:
+                    {
+                        foreach (var pol in Polygons)
+                        {
+                            foreach (var edge in pol.Value.Edges)
+                            {
+                                //check if point hit
+                                if (MyPoint.AreNear(edge.first, CurrentMousePosition, Globals.VerticleClickRadiusSize) == true)
+                                {
+                                    currentCanvas.Cursor = Cursors.Hand;
+                                    return;
+                                }
+                            }
+                            foreach (var edge in pol.Value.Edges)
+                            {
+                                //check if edge hit
+                                if (edge.relationType != RelationType.None && edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
                                 {
                                     currentCanvas.Cursor = Cursors.Hand;
                                     return;
@@ -345,7 +430,7 @@ namespace GKProjekt1
             {
                 MessageBoxResult ans = MessageBox.Show("If you change mode during drawing,\n" +
                     "currently drawn polygon will be deleted!\n" +
-                    "Do you want to continue drawing?", "Polygons", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    "Do you want to continue drawing?", Globals.WindowName, MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (ans == MessageBoxResult.Yes)
                 {
                     return false;
@@ -364,7 +449,6 @@ namespace GKProjekt1
             }
             return true;
         }
-
         private bool DoesUserWantToChangeMode(object sender)
         {
             if (ProgramMode == Mode.Draw)
@@ -377,10 +461,67 @@ namespace GKProjekt1
                     return false;
                 }
             }
-            //Add clearing after adding relations
+            else if(ProgramMode == Mode.AddEqualRelation || ProgramMode == Mode.AddPerpendicularRelation)
+            {
+                if(RelationPolygonId != -1)
+                {
+                    RelationSelectedEdge.UnselectEdge();                    
+                }
+                RelationSelectedEdge = null;
+                RelationPolygonId = -1;
+            }
             return true;
         }
+        private void GenerateSamplePolygon()
+        {
+            //TODO:
+            //generate sample polygon
+        }
 
+        private void ClearAll()
+        {
+            //delete currently drawing polygon
+            CurrentlyDrawingPolygon?.DeleteDrawing();
+            if (CurrentLine != null)
+            {
+                CurrentlyDrawingPolygon?.canvas.Children.Remove(CurrentLine);
+            }
+            CurrentLine = null;
+            CurrentlyDrawingPolygon = null;
+            PolygonDrawing = false;
+
+            //delete polygons
+            foreach (var pol in Polygons)
+            {
+                pol.Value.DeleteDrawing();
+            }
+
+            //clear variables
+            ClearVariables();
+            //set pointerbutton
+            PointerButton.IsChecked = true;
+        }
+        private void ClearVariables()
+        {
+            Polygons.Clear();
+            ProgramMode = Mode.Pointer;
+            //Pointer Variables
+            IsDraggingOn = false;
+            CurrentDragObjectType = DragObjectType.Nothing;
+            DragStartingPoint = new Point();
+            DragPolygonId = -1;
+            DragObject = null;
+
+            //Drawing Variables
+            PolygonDrawing = false;
+            CurrentlyDrawingPolygon = null;
+            PolygonNumber = 0;
+            CurrentLine = null;
+
+            //Adding Relation Variables
+            RelationPolygonId = -1;
+            RelationSelectedEdge = null;
+        }
         private void PointerMode_Click(object sender, RoutedEventArgs e)
         {
             if (DoesUserWantToChangeMode(sender) == true)
@@ -393,7 +534,7 @@ namespace GKProjekt1
         private void DeleteMode_Click(object sender, RoutedEventArgs e)
         {
             if (DoesUserWantToChangeMode(sender) == true)
-                ProgramMode = Mode.DeleteVerticle;
+                ProgramMode = Mode.DeleteVerticleOrRelation;
         }
         private void AddMiddleVerticleMode_Click(object sender, RoutedEventArgs e)
         {
@@ -405,20 +546,27 @@ namespace GKProjekt1
             if (DoesUserWantToChangeMode(sender) == true)
                 ProgramMode = Mode.AddEqualRelation;
         }
-        private void DeleteEqualRelationMode_Click(object sender, RoutedEventArgs e)
-        {
-            if (DoesUserWantToChangeMode(sender) == true)
-                ProgramMode = Mode.DeleteEqualRelation;
-        }
         private void AddPerpendicularRelationMode_Click(object sender, RoutedEventArgs e)
         {
             if (DoesUserWantToChangeMode(sender) == true)
                 ProgramMode = Mode.AddPerpendicularRelation;
         }
-        private void DeletePerpendicularRelationMode_Click(object sender, RoutedEventArgs e)
+        private void ClearAll_Click(object sender, RoutedEventArgs e)
         {
-            if (DoesUserWantToChangeMode(sender) == true)
-                ProgramMode = Mode.DeletePerpendicularRelation;
+            var result = MessageBox.Show("Are you sure?", Globals.WindowName, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                ClearAll();                
+            }
         }
+        private void GenerateSamplePolygon_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure?\nOperation will clear all first.", Globals.WindowName, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                ClearAll();
+                GenerateSamplePolygon();
+            }
+        }        
     }
 }
