@@ -9,6 +9,7 @@ namespace GKProjekt1
     public enum RelationType
     {
         Equal,
-        Perpendicular
+        Perpendicular,
+        None
     }
 }

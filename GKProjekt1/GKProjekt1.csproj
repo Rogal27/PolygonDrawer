@@ -63,6 +63,7 @@
     <Compile Include="MyPoint.cs" />
     <Compile Include="PointExtension.cs" />
     <Compile Include="PolygonDrawResult.cs" />
+    <Compile Include="RelationIcon.cs" />
     <Compile Include="RelationType.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -105,6 +106,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Bitmaps\PerpendicularBitmap.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Bitmaps\EqualBitmap.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

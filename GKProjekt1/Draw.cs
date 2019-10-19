@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace GKProjekt1
@@ -17,7 +18,7 @@ namespace GKProjekt1
             {
                 Width = Globals.VerticleSize,
                 Height = Globals.VerticleSize,
-                Fill = Globals.DefaultVerticleColor
+                Fill = new SolidColorBrush(Globals.DefaultVerticleColor)
             };
             Canvas.SetLeft(verticle, p.X - (double)Globals.VerticleSize / 2.0);
             Canvas.SetTop(verticle, p.Y - (double)Globals.VerticleSize / 2.0);
@@ -37,7 +38,7 @@ namespace GKProjekt1
                     X2 = edge.second.X,
                     Y2 = edge.second.Y,
                     StrokeThickness = Globals.LineThickness,
-                    Stroke = Globals.DefaultEdgeColor
+                    Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
                 };
                 Panel.SetZIndex(line, Globals.LineZIndex);
                 canvas.Children.Add(line);
@@ -61,7 +62,7 @@ namespace GKProjekt1
                     X2 = second.X,
                     Y2 = second.Y,
                     StrokeThickness = Globals.LineThickness,
-                    Stroke = Globals.DefaultEdgeColor
+                    Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
                 };
                 Panel.SetZIndex(line, Globals.LineZIndex);
                 canvas.Children.Add(line);

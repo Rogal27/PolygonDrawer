@@ -14,13 +14,7 @@ namespace GKProjekt1
     {
         public List<MyEdge> Edges { get; set; } = new List<MyEdge>();
         public MyPoint StartingVerticle { get; set; }
-        //public Ellipse StartingVerticleEllipse { get; set; }
-
         public MyPoint LastVerticle { get; set; }
-        //public Ellipse LastVerticleEllipse { get; set; }
-
-        public Dictionary<MyEdge, (MyEdge, RelationType)> Relations = new Dictionary<MyEdge, (MyEdge, RelationType)>();
-
         public Canvas canvas { get; set; }
 
         public MyPolygon(MyPoint startingVerticle, Canvas canvas)
@@ -31,29 +25,7 @@ namespace GKProjekt1
             Draw.Verticle(StartingVerticle, this.canvas);
         }
 
-        //public void DrawStartingVerticle(Canvas canvas)
-        //{
-        //    this.canvas = canvas;
-        //    Draw.Verticle(StartingVerticle, this.canvas);
-        //}
-
-        //public bool AddVerticle(Point p)
-        //{
-        //    if (PointExtension.AreNear(p, StartingVerticle, (double)Globals.VerticleClickRadiusSize / 2.0) == true)
-        //    {
-        //        MyEdge e = new MyEdge(LastVerticle, StartingVerticle);              
-        //        Edges.Add(e);
-        //        return false;
-        //    }
-        //    else
-        //    {
-        //        MyEdge e = new MyEdge(LastVerticle, p);
-        //        LastVerticle = p;
-        //        Edges.Add(e);
-        //        return true;
-        //    }
-        //}
-
+        //BRESENHAM!
         public PolygonDrawResult AddVerticleAndDraw(MyPoint p)
         {
             if (MyPoint.AreNear(p, StartingVerticle, (double)Globals.VerticleClickRadiusSize / 2.0) == true)
@@ -79,6 +51,7 @@ namespace GKProjekt1
             }
         }       
 
+        //BRESENHAM!
         public void MoveVerticle(MyPoint verticle, Point endPoint)
         {
             var previousEdge = Edges.Last();
@@ -95,6 +68,7 @@ namespace GKProjekt1
             }
         }
 
+        //BRESENHAM!
         public void MoveEdgeParallel(MyEdge edge, ref Point startPoint, ref Point endPoint)
         {
             var edgeIndex = Edges.IndexOf(edge);
@@ -109,6 +83,7 @@ namespace GKProjekt1
             nextEdge2.MoveWithPoints();
         }
 
+        //BRESENHAM!
         public void MovePolygon(ref Point startPoint, ref Point endPoint)
         {
             var offsetX = endPoint.X - startPoint.X;
@@ -146,7 +121,7 @@ namespace GKProjekt1
             var previousEdge = ClearEdges.Last();
 
             for (int i = 0; i < ClearEdges.Count; i++)
-            {                
+            {
                 var edge = ClearEdges[i];
                 var nextEdge = ClearEdges[(i + 1) % ClearEdges.Count];
                 if (MyEdge.DoIntersect(edge, Ray) == true)
@@ -194,11 +169,24 @@ namespace GKProjekt1
                         intersectCounter++;
                     }
                 }
-                previousEdge = edge;                
+                previousEdge = edge;
             }
-
-
             return intersectCounter % 2 == 1;
+        }
+
+        //BRESENHAM!
+        public void AddMiddleVerticleOnEdge(MyEdge edge)
+        {
+            var index = Edges.IndexOf(edge);
+            var middleX = (edge.first.X + edge.second.X) / 2.0;
+            var middleY = (edge.first.Y + edge.second.Y) / 2.0;
+            MyPoint middleVerticle = new MyPoint(middleX, middleY);
+            Draw.Verticle(middleVerticle, canvas);            
+            MyEdge secondHalf = new MyEdge(middleVerticle, edge.second);
+            Draw.Edge(secondHalf, canvas);
+            edge.second = middleVerticle;
+            edge.MoveWithPoints();
+            Edges.Insert(index + 1, secondHalf);
         }
 
         private List<MyEdge> RemoveCollinearEdges()
@@ -240,6 +228,7 @@ namespace GKProjekt1
             return ClearEdges;
         }
 
+        //BRESENHAM!
         public void DeleteDrawing()
         {
             foreach(var edge in Edges)
@@ -248,11 +237,6 @@ namespace GKProjekt1
                 canvas.Children.Remove(edge.first.ellipse);
                 canvas.Children.Remove(edge.second.ellipse);
             }
-        }
-
-        public void AddRelation()
-        {
-            throw new NotImplementedException();
         }
     }
 }

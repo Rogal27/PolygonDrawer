@@ -9,6 +9,12 @@ namespace GKProjekt1
     public enum Mode
     {
         Pointer,
-        Draw
+        Draw,
+        DeleteVerticle,
+        AddMiddleVerticle,
+        AddEqualRelation,
+        DeleteEqualRelation,
+        AddPerpendicularRelation,
+        DeletePerpendicularRelation
     }
 }
