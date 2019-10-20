@@ -46,8 +46,9 @@ namespace GKProjekt1
 
         
         public MainWindow()
-        {
+        {            
             InitializeComponent();
+            Panel.SetZIndex(ButtonGridRow, Globals.ButtonsGridZIndex);
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -204,10 +205,23 @@ namespace GKProjekt1
                                     {                                        
                                         if (Object.ReferenceEquals(edge, RelationSelectedEdge) == false)
                                         {
-                                            edge.relationIcon = new RelationIcon(edge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
-                                            RelationSelectedEdge.relationIcon = new RelationIcon(RelationSelectedEdge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
                                             edge.relationEdge = RelationSelectedEdge;
-                                            RelationSelectedEdge.relationEdge = edge;                                            
+                                            RelationSelectedEdge.relationEdge = edge;
+                                            edge.relationType = relationType;
+                                            RelationSelectedEdge.relationType = relationType;
+                                            var result = Polygons[RelationPolygonId].ApplyRelationChanges(edge);
+                                            if (result == true)
+                                            {
+                                                edge.relationIcon = new RelationIcon(edge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
+                                                RelationSelectedEdge.relationIcon = new RelationIcon(RelationSelectedEdge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);                                                
+                                            }
+                                            else
+                                            {
+                                                edge.relationEdge = null;
+                                                RelationSelectedEdge.relationEdge = null;
+                                                edge.relationType = RelationType.None;
+                                                RelationSelectedEdge.relationType = RelationType.None;
+                                            }
                                         }
                                         RelationSelectedEdge.UnselectEdge();
                                         RelationSelectedEdge = null;

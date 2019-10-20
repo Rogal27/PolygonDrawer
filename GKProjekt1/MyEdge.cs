@@ -137,6 +137,14 @@ namespace GKProjekt1
             }
         }
 
+        //public MyEdge CopyWithouDrawing()
+        //{
+        //    MyEdge edge = new MyEdge(this.first.CopyWithoutDrawing(), this.second.CopyWithoutDrawing());
+        //    edge.relationType = this.relationType;
+        //    edge.relationEdge = null;
+        //    return edge;
+        //}
+
         public static bool operator ==(MyEdge e1, MyEdge e2)
         {
             if (e1.first == e2.first && e1.second == e2.second)

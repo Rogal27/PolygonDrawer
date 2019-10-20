@@ -67,13 +67,7 @@ namespace GKProjekt1
                     RelationCounter[PolygonId] = (RelationCounter[PolygonId].EqualCounter, RelationCounter[PolygonId].PerpendicularCounter + 1);
                 }
 
-                var points = CalculatePoints();
-
-                Canvas.SetLeft(image, points.imagePoint.X);
-                Canvas.SetTop(image, points.imagePoint.Y);
-
-                Canvas.SetLeft(text, points.textPoint.X);
-                Canvas.SetTop(text, points.textPoint.Y);
+                MoveIcon();
 
                 Panel.SetZIndex(image, Globals.ImageZIndex);
                 Panel.SetZIndex(text, Globals.ImageZIndex);
@@ -85,11 +79,13 @@ namespace GKProjekt1
         public void MoveIcon()
         {
             var points = CalculatePoints();
-            Canvas.SetLeft(image, points.imagePoint.X);
-            Canvas.SetTop(image, points.imagePoint.Y);
+            if (points.HasValue == false)
+                return;
+            Canvas.SetLeft(image, points.Value.imagePoint.X);
+            Canvas.SetTop(image, points.Value.imagePoint.Y);
 
-            Canvas.SetLeft(text, points.textPoint.X);
-            Canvas.SetTop(text, points.textPoint.Y);
+            Canvas.SetLeft(text, points.Value.textPoint.X);
+            Canvas.SetTop(text, points.Value.textPoint.Y);
         }
 
         public void Delete()
@@ -98,7 +94,7 @@ namespace GKProjekt1
             polygon.canvas.Children.Remove(text);
         }
 
-        private (Point imagePoint, Point textPoint) CalculatePoints()
+        private (Point imagePoint, Point textPoint)? CalculatePoints()
         {
             double middleX = (edge.first.X + edge.second.X) / 2.0 - (double)Globals.BitmapSize / 2.0;
             double middleY = (edge.first.Y + edge.second.Y) / 2.0 - (double)Globals.BitmapSize / 2.0;
@@ -106,15 +102,20 @@ namespace GKProjekt1
             double vectorX = edge.second.Y - edge.first.Y;
             double vectorY = edge.first.X - edge.second.X;
 
-            double newMiddleX = middleX + vectorX * Globals.ImagePositionScale / edge.Length();
-            double newMiddleY = middleY + vectorY * Globals.ImagePositionScale / edge.Length();
+            var edgeLength = edge.Length();
+
+            if (edgeLength <= Globals.eps)
+                return null;
+
+            double newMiddleX = middleX + vectorX * Globals.ImagePositionScale / edgeLength;
+            double newMiddleY = middleY + vectorY * Globals.ImagePositionScale / edgeLength;
 
             if (polygon.IsPointInside(new Point(newMiddleX, newMiddleY)) == true)
             {
                 vectorX *= -1.0;
                 vectorY *= -1.0;
-                newMiddleX = middleX + vectorX * Globals.ImagePositionScale / edge.Length();
-                newMiddleY = middleY + vectorY * Globals.ImagePositionScale / edge.Length();
+                newMiddleX = middleX + vectorX * Globals.ImagePositionScale / edgeLength;
+                newMiddleY = middleY + vectorY * Globals.ImagePositionScale / edgeLength;
             }
 
             Point imagePoint = new Point(newMiddleX, newMiddleY);
