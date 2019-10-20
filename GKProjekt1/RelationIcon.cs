@@ -12,7 +12,7 @@ namespace GKProjekt1
 {
     public class RelationIcon
     {
-        private static Dictionary<int, (int EqualCounter, int PerpendicularCounter)> RelationCounter = new Dictionary<int, (int EqualCounter, int PerpendicularCounter)>();
+        public static Dictionary<int, (int EqualCounter, int PerpendicularCounter)> RelationCounter = new Dictionary<int, (int EqualCounter, int PerpendicularCounter)>();
         
         public RelationType relation { get; }
 

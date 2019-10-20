@@ -510,6 +510,9 @@ namespace GKProjekt1
                 pol.Value.DeleteDrawing();
             }
 
+            //clear RelationIcon
+            RelationIcon.RelationCounter.Clear();
+
             //clear variables
             ClearVariables();
             //set pointerbutton

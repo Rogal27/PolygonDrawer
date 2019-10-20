@@ -82,7 +82,7 @@ namespace GKProjekt1
 
         public static bool CheckIfCollinear(MyPoint p1, MyPoint p2, MyPoint p3)
         {
-            return (p1.X - p2.X) * (p3.Y - p2.Y) - (p3.X - p2.X) * (p1.Y - p2.Y) == 0;
+            return Math.Abs((p1.X - p2.X) * (p3.Y - p2.Y) - (p3.X - p2.X) * (p1.Y - p2.Y)) <= Globals.eps;
         }
 
         public static bool operator ==(MyPoint p1, MyPoint p2)
