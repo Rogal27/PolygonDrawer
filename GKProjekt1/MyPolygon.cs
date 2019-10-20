@@ -94,6 +94,11 @@ namespace GKProjekt1
             return success;
         }
 
+        private static bool CheckIfRelationsAreOK(MyPolygon polygon)
+        {
+            return false;
+        }
+
         //unfinished
         private (bool success,MyPolygon changedPolygon) FixRelationsMovingVerticle(MyEdge startingEdge)
         {
@@ -103,6 +108,22 @@ namespace GKProjekt1
             bool firstSuccess = false;
             bool secondSuccess = false;
 
+            MyEdge relationEdge;
+            double length;
+            double relationEdgeLength;
+            double vectorX;
+            double vectorY;
+            double scale;
+            double directionVectorX;
+
+            Vector v1 = new Vector();
+            Vector v2 = new Vector();
+            Point APoint = new Point();
+            Point BPoint = new Point();
+            Point CPoint = new Point();
+            Point DPoint = new Point();
+            Point? intersection;
+
             //going right (list order)
             for (int i = 0; i < copyPolygon.Edges.Count && endLoop == false; i++)
             {
@@ -110,32 +131,108 @@ namespace GKProjekt1
                 switch (edge.relationType)
                 {
                     case RelationType.Equal:
-                        //moving second verticle
-                        var relationEdge = edge.relationEdge;
-                        var length = edge.Length();
-                        var relationEdgeLength = relationEdge.Length();
-                        if (length < Globals.eps || relationEdgeLength < Globals.eps)
                         {
-                            //chyba
-                            endLoop = true;
-                            firstSuccess = true;
-                            break;
+                            //moving second verticle
+                            relationEdge = edge.relationEdge;
+                            length = edge.Length();
+                            relationEdgeLength = relationEdge.Length();
+                            if (length < Globals.eps || relationEdgeLength < Globals.eps)
+                            {
+                                //chyba
+                                endLoop = true;
+                                firstSuccess = true;
+                                break;
+                            }
+                            if (Math.Abs(relationEdgeLength - length) < Globals.eps)
+                            {
+                                break;
+                            }
+                            vectorX = edge.second.X - edge.first.X;
+                            vectorY = edge.second.Y - edge.first.Y;
+                            scale = relationEdgeLength / length;
+                            vectorX *= scale;
+                            vectorY *= scale;
+                            edge.second.X = edge.first.X + vectorX;
+                            edge.second.Y = edge.first.Y + vectorY;
+                            //Debug.WriteLine($"Edge second: ({edge.second.X};{edge.second.Y})");
                         }
-                        if (Math.Abs(relationEdgeLength - length) < Globals.eps)
-                        {
-                            break;
-                        }
-                        var vectorX = edge.second.X - edge.first.X;
-                        var vectorY = edge.second.Y - edge.first.Y;
-                        var scale = relationEdgeLength / length;
-                        vectorX *= scale;
-                        vectorY *= scale;
-                        edge.second.X = edge.first.X + vectorX;
-                        edge.second.Y = edge.first.Y + vectorY;
-                        //Debug.WriteLine($"Edge second: ({edge.second.X};{edge.second.Y})");
                         break;
                     case RelationType.Perpendicular:
-                        //potem
+                        {
+                            //moving second verticle
+                            relationEdge = edge.relationEdge;
+
+                            v1.X = relationEdge.second.X - relationEdge.first.X;
+                            v1.Y = relationEdge.second.Y - relationEdge.first.Y;
+                            v2.X = relationEdge.second.Y - relationEdge.first.Y;
+                            v2.Y = relationEdge.first.X - relationEdge.second.X;
+
+                            APoint.X = edge.first.X;
+                            APoint.Y = edge.first.Y;
+                            BPoint = APoint + v2;
+                            CPoint.X = edge.second.X;
+                            CPoint.Y = edge.second.Y;
+                            DPoint = CPoint + v1;
+
+                            intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
+
+                            if (intersection.HasValue == true)
+                            {
+                                edge.second.X = intersection.Value.X;
+                                edge.second.Y = intersection.Value.Y;
+                            }
+                            else
+                            {
+                                edge.first.X += 5.0;
+                                edge.first.Y += 5.0;
+
+                                v1.X = relationEdge.second.X - relationEdge.first.X;
+                                v1.Y = relationEdge.second.Y - relationEdge.first.Y;
+                                v2.X = relationEdge.second.Y - relationEdge.first.Y;
+                                v2.Y = relationEdge.first.X - relationEdge.second.X;
+
+                                APoint.X = edge.first.X;
+                                APoint.Y = edge.first.Y;
+                                BPoint = APoint + v2;
+                                CPoint.X = edge.second.X;
+                                CPoint.Y = edge.second.Y;
+                                DPoint = CPoint + v1;
+
+                                intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
+
+                                //edge.first.X -= 10.0;
+                                //edge.first.Y -= 10.0;
+                                if (intersection.HasValue == true)
+                                {
+                                    edge.second.X = intersection.Value.X;
+                                    edge.second.Y = intersection.Value.Y;
+                                }
+                            }
+                            //vectorX = relationEdge.first.Y - relationEdge.second.Y;
+                            //vectorY = relationEdge.second.X - relationEdge.first.X;
+                            //scale = length / relationEdgeLength;
+                            //vectorX *= scale;
+                            //vectorY *= scale;
+                            //directionVectorX = edge.second.X - edge.first.X;
+                            //if (directionVectorX >= 0)
+                            //{
+                            //    if (vectorX < 0)
+                            //    {
+                            //        vectorX *= (-1.0);
+                            //        vectorY *= (-1.0);
+                            //    }
+                            //}
+                            //else
+                            //{
+                            //    if (vectorX > 0)
+                            //    {
+                            //        vectorX *= (-1.0);
+                            //        vectorY *= (-1.0);
+                            //    }
+                            //}
+                            //edge.second.X = edge.first.X + vectorX;
+                            //edge.second.Y = edge.first.Y + vectorY;
+                        }
                         break;
                     case RelationType.None:
                         endLoop = true;
@@ -155,31 +252,109 @@ namespace GKProjekt1
                 switch (edge.relationType)
                 {
                     case RelationType.Equal:
-                        //moving second verticle
-                        var relationEdge = edge.relationEdge;
-                        var length = edge.Length();
-                        var relationEdgeLength = relationEdge.Length();
-                        if (length < Globals.eps || relationEdgeLength < Globals.eps)
                         {
-                            //chyba
-                            endLoop = true;
-                            secondSuccess = true;
-                            break;
+                            //moving second verticle
+                            relationEdge = edge.relationEdge;
+                            length = edge.Length();
+                            relationEdgeLength = relationEdge.Length();
+                            if (length < Globals.eps || relationEdgeLength < Globals.eps)
+                            {
+                                //chyba
+                                endLoop = true;
+                                secondSuccess = true;
+                                break;
+                            }
+                            if (Math.Abs(relationEdgeLength - length) < Globals.eps)
+                            {
+                                break;
+                            }
+                            vectorX = edge.first.X - edge.second.X;
+                            vectorY = edge.first.Y - edge.second.Y;
+                            scale = relationEdgeLength / length;
+                            vectorX *= scale;
+                            vectorY *= scale;
+                            edge.first.X = edge.second.X + vectorX;
+                            edge.first.Y = edge.second.Y + vectorY;
                         }
-                        if (Math.Abs(relationEdgeLength - length) < Globals.eps)
-                        {
-                            break;
-                        }
-                        var vectorX = edge.first.X - edge.second.X;
-                        var vectorY = edge.first.Y - edge.second.Y;
-                        var scale = relationEdgeLength / length;
-                        vectorX *= scale;
-                        vectorY *= scale;
-                        edge.first.X = edge.second.X + vectorX;
-                        edge.first.Y = edge.second.Y + vectorY;
                         break;
                     case RelationType.Perpendicular:
-                        //potem
+                        {
+                            relationEdge = edge.relationEdge;
+
+                            v1.X = relationEdge.first.X - relationEdge.second.X;
+                            v1.Y = relationEdge.first.Y - relationEdge.second.Y;
+                            v2.X = relationEdge.first.Y - relationEdge.second.Y;
+                            v2.Y = relationEdge.second.X - relationEdge.first.X;
+
+                            APoint.X = edge.second.X;
+                            APoint.Y = edge.second.Y;
+                            BPoint = APoint + v2;
+                            CPoint.X = edge.first.X;
+                            CPoint.Y = edge.first.Y;
+                            DPoint = CPoint + v1;
+
+                            intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
+
+                            if (intersection.HasValue == true)
+                            {
+                                edge.first.X = intersection.Value.X;
+                                edge.first.Y = intersection.Value.Y;
+                            }
+                            else
+                            {
+                                edge.second.X += 5.0;
+                                edge.second.Y += 5.0;
+
+                                v1.X = relationEdge.first.X - relationEdge.second.X;
+                                v1.Y = relationEdge.first.Y - relationEdge.second.Y;
+                                v2.X = relationEdge.first.Y - relationEdge.second.Y;
+                                v2.Y = relationEdge.second.X - relationEdge.first.X;
+
+                                APoint.X = edge.second.X;
+                                APoint.Y = edge.second.Y;
+                                BPoint = APoint + v2;
+                                CPoint.X = edge.first.X;
+                                CPoint.Y = edge.first.Y;
+                                DPoint = CPoint + v1;
+
+                                intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
+
+                                //edge.second.X -= 10.0;
+                                //edge.second.Y -= 10.0;
+                                if (intersection.HasValue == true)
+                                {
+                                    edge.first.X = intersection.Value.X;
+                                    edge.first.Y = intersection.Value.Y;
+                                }
+                            }
+
+                            //length = edge.Length();
+                            //relationEdgeLength = relationEdge.Length();
+                            //vectorX = relationEdge.second.Y - relationEdge.first.Y;
+                            //vectorY = relationEdge.first.X - relationEdge.second.X;
+                            //scale = length / relationEdgeLength;
+                            //vectorX *= scale;
+                            //vectorY *= scale;
+                            //directionVectorX = edge.second.X - edge.first.X;
+                            //if (directionVectorX >= 0)
+                            //{
+                            //    if (vectorX < 0)
+                            //    {
+                            //        vectorX *= (-1.0);
+                            //        vectorY *= (-1.0);
+                            //    }
+                            //}
+                            //else
+                            //{
+                            //    if (vectorX > 0)
+                            //    {
+                            //        vectorX *= (-1.0);
+                            //        vectorY *= (-1.0);
+                            //    }
+                            //}
+                            //edge.first.X = edge.second.X + vectorX;
+                            //edge.first.Y = edge.second.Y + vectorY;
+                        }
                         break;
                     case RelationType.None:
                         endLoop = true;
