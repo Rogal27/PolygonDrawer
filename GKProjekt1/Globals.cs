@@ -16,6 +16,8 @@ namespace GKProjekt1
         public static Color DefaultEdgeColor = Color.FromRgb(0, 0, 0);
         public static Color SelectedEdgeColor = Color.FromRgb(255, 0, 255);
         public static Color RelationFontColor = Color.FromRgb(255, 0, 0);
+        //buttons grid
+        public static int ButtonsGridZIndex = 100;
         //verticle
         public static int VerticleSize = 10;
         public static int VerticleClickRadiusSize = 15;
@@ -34,5 +36,7 @@ namespace GKProjekt1
         public static double ImagePositionScale = 20.0; 
         //relation text
         public static int RelationFontSize = 16;
+        //Math
+        public static double eps = 1e-9;
     }
 }

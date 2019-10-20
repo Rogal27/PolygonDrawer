@@ -43,6 +43,12 @@ namespace GKProjekt1
             Canvas.SetTop(ellipse, p.Y - (double)Globals.VerticleSize / 2.0);
         } 
 
+        public MyPoint CopyWithoutDrawing()
+        {
+            MyPoint p = new MyPoint(X, Y);
+            return p;
+        }
+
         public static MyPoint operator -(MyPoint p1, MyPoint p2)
         {
             return new MyPoint(p1.X - p2.X, p1.Y - p2.Y);

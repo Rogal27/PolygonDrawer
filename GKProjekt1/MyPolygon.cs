@@ -17,6 +17,11 @@ namespace GKProjekt1
         public MyPoint LastVerticle { get; set; }
         public Canvas canvas { get; set; }
 
+        public MyPolygon()
+        {
+
+        }
+
         public MyPolygon(MyPoint startingVerticle, Canvas canvas)
         {
             StartingVerticle = startingVerticle;
@@ -54,17 +59,155 @@ namespace GKProjekt1
         //BRESENHAM!
         public void MoveVerticle(MyPoint verticle, Point endPoint)
         {
-            var previousEdge = Edges.Last();
+            //var previousEdge = Edges.Last();
             foreach (var edge in Edges)
             {
                 if (Object.ReferenceEquals(edge.first, verticle) == true)
                 {
+                    var previousPoint = new Point(verticle.X, verticle.Y);
                     verticle.Move(endPoint);
-                    edge.MoveWithPoints();
-                    previousEdge.MoveWithPoints();
+                    //edge.MoveWithPoints();
+                    //previousEdge.MoveWithPoints();
+                    var result = ApplyRelationChanges(edge);
+                    if (result == false)
+                    {
+                        verticle.Move(previousPoint);
+                    }
+
                     return;
                 }
-                previousEdge = edge;
+                //previousEdge = edge;
+            }
+        }
+
+        public bool ApplyRelationChanges(MyEdge movedEdge)
+        {
+            var (success, changedPolygon) = FixRelationsMovingVerticle(movedEdge);
+            if (success == false)
+            {
+                MessageBox.Show("Unallowed Move!", Globals.WindowName, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            else
+            {
+                RedrawPolygon(changedPolygon);
+            }
+            return success;
+        }
+
+        //unfinished
+        private (bool success,MyPolygon changedPolygon) FixRelationsMovingVerticle(MyEdge startingEdge)
+        {
+            MyPolygon copyPolygon = this.CopyWithoutDrawing();
+            var startingEdgeIndex = copyPolygon.Edges.FindIndex(x => x == startingEdge);
+            bool endLoop = false;
+            bool firstSuccess = false;
+            bool secondSuccess = false;
+
+            //going right (list order)
+            for (int i = 0; i < copyPolygon.Edges.Count && endLoop == false; i++)
+            {
+                var edge = copyPolygon.Edges[(i + startingEdgeIndex) % copyPolygon.Edges.Count];
+                switch (edge.relationType)
+                {
+                    case RelationType.Equal:
+                        //moving second verticle
+                        var relationEdge = edge.relationEdge;
+                        var length = edge.Length();
+                        var relationEdgeLength = relationEdge.Length();
+                        if (length < Globals.eps || relationEdgeLength < Globals.eps)
+                        {
+                            //chyba
+                            endLoop = true;
+                            firstSuccess = true;
+                            break;
+                        }
+                        if (Math.Abs(relationEdgeLength - length) < Globals.eps)
+                        {
+                            break;
+                        }
+                        var vectorX = edge.second.X - edge.first.X;
+                        var vectorY = edge.second.Y - edge.first.Y;
+                        var scale = relationEdgeLength / length;
+                        vectorX *= scale;
+                        vectorY *= scale;
+                        edge.second.X = edge.first.X + vectorX;
+                        edge.second.Y = edge.first.Y + vectorY;
+                        //Debug.WriteLine($"Edge second: ({edge.second.X};{edge.second.Y})");
+                        break;
+                    case RelationType.Perpendicular:
+                        //potem
+                        break;
+                    case RelationType.None:
+                        endLoop = true;
+                        firstSuccess = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (firstSuccess == false)//moze warto sprawdzic czy relacje sa ok
+                return (false, null);
+            endLoop = false;
+            //going left (no list order)
+            for (int i = copyPolygon.Edges.Count - 1; i >= 0 && endLoop == false; i--)
+            {
+                var edge = copyPolygon.Edges[(i + startingEdgeIndex) % copyPolygon.Edges.Count];
+                switch (edge.relationType)
+                {
+                    case RelationType.Equal:
+                        //moving second verticle
+                        var relationEdge = edge.relationEdge;
+                        var length = edge.Length();
+                        var relationEdgeLength = relationEdge.Length();
+                        if (length < Globals.eps || relationEdgeLength < Globals.eps)
+                        {
+                            //chyba
+                            endLoop = true;
+                            secondSuccess = true;
+                            break;
+                        }
+                        if (Math.Abs(relationEdgeLength - length) < Globals.eps)
+                        {
+                            break;
+                        }
+                        var vectorX = edge.first.X - edge.second.X;
+                        var vectorY = edge.first.Y - edge.second.Y;
+                        var scale = relationEdgeLength / length;
+                        vectorX *= scale;
+                        vectorY *= scale;
+                        edge.first.X = edge.second.X + vectorX;
+                        edge.first.Y = edge.second.Y + vectorY;
+                        break;
+                    case RelationType.Perpendicular:
+                        //potem
+                        break;
+                    case RelationType.None:
+                        endLoop = true;
+                        secondSuccess = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (secondSuccess == false)//moze warto sprawdzic czy relacje sa ok
+                return (false, null);
+
+
+            return (true,copyPolygon);
+        }
+
+        //BRESENHAM!
+        private void RedrawPolygon(MyPolygon polygon)
+        {
+            for (int i = 0; i < Edges.Count; i++)
+            {
+                var edge = Edges[i];
+                var newEdge = polygon.Edges[i];
+                edge.first.Move(newEdge.first.X, newEdge.first.Y);
+            }
+            foreach(var edge in Edges)
+            {
+                edge.MoveWithPoints();
             }
         }
 
@@ -125,16 +268,26 @@ namespace GKProjekt1
         //BRESENHAM!
         public void MoveEdgeParallel(MyEdge edge, ref Point startPoint, ref Point endPoint)
         {
-            var edgeIndex = Edges.IndexOf(edge);
-            if (edgeIndex == -1)
-                return;
-            int edgesCount = Edges.Count;
-            var previousEdge2 = Edges[(edgeIndex - 1 + edgesCount) % edgesCount];
-            var nextEdge2 = Edges[(edgeIndex + 1 + edgesCount) % edgesCount];
+            var startPointCopy = new Point(startPoint.X, startPoint.Y);
+            var endPointCopy = new Point(endPoint.X, endPoint.Y);
+            //var edgeIndex = Edges.IndexOf(edge);
+            //if (edgeIndex == -1)
+            //    return;
+            //int edgesCount = Edges.Count;
+            //var previousEdge2 = Edges[(edgeIndex - 1 + edgesCount) % edgesCount];
+            //var nextEdge2 = Edges[(edgeIndex + 1 + edgesCount) % edgesCount];
             edge.MoveParallel(startPoint, endPoint);
+            var result = ApplyRelationChanges(edge);
             startPoint = endPoint;
-            previousEdge2.MoveWithPoints();
-            nextEdge2.MoveWithPoints();
+            if (result == false)
+            {
+                edge.MoveParallel(endPointCopy, startPointCopy);
+                startPoint = startPointCopy;
+                endPoint = endPointCopy;
+            }
+            
+            //previousEdge2.MoveWithPoints();
+            //nextEdge2.MoveWithPoints();
         }
 
         //BRESENHAM!
@@ -265,10 +418,40 @@ namespace GKProjekt1
             return ClearEdges;
         }
 
+        public MyPolygon CopyWithoutDrawing()
+        {
+            List<MyPoint> verticleList = new List<MyPoint>();
+            MyPolygon p = new MyPolygon();
+            p.Edges = new List<MyEdge>();
+            //add to verticleList
+            foreach (var edge in Edges)
+            {
+                verticleList.Add(edge.first.CopyWithoutDrawing());
+            }
+            //create edges list from verticleList
+            for (int i = 0; i < verticleList.Count; i++)
+            {
+                var edge = new MyEdge(verticleList[i], verticleList[(i + 1) % verticleList.Count]);
+                p.Edges.Add(edge);
+            }
+
+            //copying relations
+            for (int i = 0; i < Edges.Count; i++)
+            {
+                p.Edges[i].relationType = Edges[i].relationType;
+                if (Edges[i].relationType != RelationType.None)
+                {
+                    var index = Edges.FindIndex(x => Object.ReferenceEquals(x, Edges[i].relationEdge) == true);
+                    p.Edges[i].relationEdge = p.Edges[index];
+                }
+            }
+            return p;
+        }
+
         //BRESENHAM!
         public void DeleteDrawing()
         {
-            foreach(var edge in Edges)
+            foreach (var edge in Edges)
             {
                 edge.DeleteRelation();
                 canvas.Children.Remove(edge.line);
