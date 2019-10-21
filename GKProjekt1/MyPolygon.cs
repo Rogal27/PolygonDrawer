@@ -92,12 +92,7 @@ namespace GKProjekt1
                 RedrawPolygon(changedPolygon);
             }
             return success;
-        }
-
-        private static bool CheckIfRelationsAreOK(MyPolygon polygon)
-        {
-            return false;
-        }
+        }        
 
         //unfinished
         private (bool success,MyPolygon changedPolygon) FixRelationsMovingVerticle(MyEdge startingEdge)
@@ -114,7 +109,6 @@ namespace GKProjekt1
             double vectorX;
             double vectorY;
             double scale;
-            double directionVectorX;
 
             Vector v1 = new Vector();
             Vector v2 = new Vector();
@@ -138,7 +132,6 @@ namespace GKProjekt1
                             relationEdgeLength = relationEdge.Length();
                             if (length < Globals.eps || relationEdgeLength < Globals.eps)
                             {
-                                //chyba
                                 endLoop = true;
                                 firstSuccess = true;
                                 break;
@@ -200,38 +193,12 @@ namespace GKProjekt1
 
                                 intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
 
-                                //edge.first.X -= 10.0;
-                                //edge.first.Y -= 10.0;
                                 if (intersection.HasValue == true)
                                 {
                                     edge.second.X = intersection.Value.X;
                                     edge.second.Y = intersection.Value.Y;
                                 }
                             }
-                            //vectorX = relationEdge.first.Y - relationEdge.second.Y;
-                            //vectorY = relationEdge.second.X - relationEdge.first.X;
-                            //scale = length / relationEdgeLength;
-                            //vectorX *= scale;
-                            //vectorY *= scale;
-                            //directionVectorX = edge.second.X - edge.first.X;
-                            //if (directionVectorX >= 0)
-                            //{
-                            //    if (vectorX < 0)
-                            //    {
-                            //        vectorX *= (-1.0);
-                            //        vectorY *= (-1.0);
-                            //    }
-                            //}
-                            //else
-                            //{
-                            //    if (vectorX > 0)
-                            //    {
-                            //        vectorX *= (-1.0);
-                            //        vectorY *= (-1.0);
-                            //    }
-                            //}
-                            //edge.second.X = edge.first.X + vectorX;
-                            //edge.second.Y = edge.first.Y + vectorY;
                         }
                         break;
                     case RelationType.None:
@@ -242,8 +209,11 @@ namespace GKProjekt1
                         break;
                 }
             }
-            if (firstSuccess == false)//moze warto sprawdzic czy relacje sa ok
-                return (false, null);
+            if (firstSuccess == false)
+            {
+                if (CheckIfRelationsAreOK(copyPolygon) == false)
+                    return (false, null);
+            }
             endLoop = false;
             //going left (no list order)
             for (int i = copyPolygon.Edges.Count - 1; i >= 0 && endLoop == false; i--)
@@ -259,7 +229,6 @@ namespace GKProjekt1
                             relationEdgeLength = relationEdge.Length();
                             if (length < Globals.eps || relationEdgeLength < Globals.eps)
                             {
-                                //chyba
                                 endLoop = true;
                                 secondSuccess = true;
                                 break;
@@ -319,41 +288,12 @@ namespace GKProjekt1
 
                                 intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
 
-                                //edge.second.X -= 10.0;
-                                //edge.second.Y -= 10.0;
                                 if (intersection.HasValue == true)
                                 {
                                     edge.first.X = intersection.Value.X;
                                     edge.first.Y = intersection.Value.Y;
                                 }
                             }
-
-                            //length = edge.Length();
-                            //relationEdgeLength = relationEdge.Length();
-                            //vectorX = relationEdge.second.Y - relationEdge.first.Y;
-                            //vectorY = relationEdge.first.X - relationEdge.second.X;
-                            //scale = length / relationEdgeLength;
-                            //vectorX *= scale;
-                            //vectorY *= scale;
-                            //directionVectorX = edge.second.X - edge.first.X;
-                            //if (directionVectorX >= 0)
-                            //{
-                            //    if (vectorX < 0)
-                            //    {
-                            //        vectorX *= (-1.0);
-                            //        vectorY *= (-1.0);
-                            //    }
-                            //}
-                            //else
-                            //{
-                            //    if (vectorX > 0)
-                            //    {
-                            //        vectorX *= (-1.0);
-                            //        vectorY *= (-1.0);
-                            //    }
-                            //}
-                            //edge.first.X = edge.second.X + vectorX;
-                            //edge.first.Y = edge.second.Y + vectorY;
                         }
                         break;
                     case RelationType.None:
@@ -364,8 +304,11 @@ namespace GKProjekt1
                         break;
                 }
             }
-            if (secondSuccess == false)//moze warto sprawdzic czy relacje sa ok
-                return (false, null);
+            if (secondSuccess == false)
+            {
+                if (CheckIfRelationsAreOK(copyPolygon) == false)
+                    return (false, null);
+            }
 
 
             return (true,copyPolygon);
@@ -633,6 +576,45 @@ namespace GKProjekt1
                 canvas.Children.Remove(edge.first.ellipse);
                 canvas.Children.Remove(edge.second.ellipse);
             }
+        }
+
+        private static bool CheckIfRelationsAreOK(MyPolygon polygon)
+        {
+            MyEdge relationEdge;
+            Vector v1 = new Vector();
+            Vector v2 = new Vector();
+            foreach (var edge in polygon.Edges)
+            {
+                switch (edge.relationType)
+                {
+                    case RelationType.Equal:
+                        relationEdge = edge.relationEdge;
+                        var length = edge.Length();
+                        var relationEdgeLength = relationEdge.Length();
+                        if (Math.Abs(length - relationEdgeLength) > Globals.eps)
+                        {
+                            return false;
+                        }
+                        break;
+                    case RelationType.Perpendicular:
+                        relationEdge = edge.relationEdge;
+                        v1.X = edge.second.X - edge.first.X;
+                        v1.Y = edge.second.Y - edge.first.Y;
+                        v2.X = relationEdge.second.X - relationEdge.first.X;
+                        v2.Y = relationEdge.second.Y - relationEdge.first.Y;
+                        double dotProduct = v1.X * v2.X + v1.Y * v2.Y;
+                        if (Math.Abs(dotProduct) > Globals.eps)
+                        {
+                            return false;
+                        }
+                        break;
+                    case RelationType.None:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return false;
         }
     }
 }
