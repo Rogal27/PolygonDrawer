@@ -77,6 +77,8 @@
             </Button>
         </Grid>
         <Canvas Grid.Row="1" Name="PolygonCanvas" Background="White" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="PolygonCanvas_MouseMove" MouseLeftButtonUp="Canvas_MouseLeftButtonUp" >
+            
         </Canvas>
+        
     </Grid>
 </Window>
