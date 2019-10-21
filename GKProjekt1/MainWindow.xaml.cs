@@ -291,13 +291,19 @@ namespace GKProjekt1
                                 case DragObjectType.Verticle:
                                     MyPoint verticle = DragObject as MyPoint;
                                     Polygons[DragPolygonId].MoveVerticle(verticle, CurrentMousePosition);
+                                    currentCanvas.Cursor = Cursors.Wait;
+                                    return;
                                     break;
                                 case DragObjectType.Edge:
                                     MyEdge movedEdge = DragObject as MyEdge;
                                     Polygons[DragPolygonId].MoveEdgeParallel(movedEdge, ref DragStartingPoint, ref CurrentMousePosition);
+                                    currentCanvas.Cursor = Cursors.Wait;
+                                    return;
                                     break;
                                 case DragObjectType.Polygon:
                                     Polygons[DragPolygonId].MovePolygon(ref DragStartingPoint, ref CurrentMousePosition);
+                                    currentCanvas.Cursor = Cursors.Wait;
+                                    return;
                                     break;
                                 case DragObjectType.Nothing:
                                     break;
@@ -333,9 +339,9 @@ namespace GKProjekt1
                                     currentCanvas.Cursor = Cursors.SizeAll;
                                     return;
                                 }
-                            }
-                            currentCanvas.Cursor = Cursors.Arrow;
+                            }                            
                         }
+                        currentCanvas.Cursor = Cursors.Arrow;
                     }
                     break;
                 case Mode.Draw:

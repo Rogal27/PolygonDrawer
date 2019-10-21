@@ -65,8 +65,19 @@ namespace GKProjekt1
             }
             else
             {
-                secondPoint = second;
-                DrawLine(Globals.DefaultEdgeColor);
+                Vector v1 = new Vector(firstPoint.X - second.X, firstPoint.Y - second.Y);
+                if (v1.X < Globals.eps && v1.Y < Globals.eps)
+                {
+                    secondPoint = second;
+                    DrawLine(Globals.DefaultEdgeColor);
+                }
+                else
+                {
+                    v1.Normalize();
+                    Point newSecond = new Point(second.X + 5 * v1.X, second.Y + 5 * v1.Y);
+                    secondPoint = newSecond;
+                    DrawLine(Globals.DefaultEdgeColor);
+                }
             }
         }
 
@@ -172,6 +183,8 @@ namespace GKProjekt1
             for (int i = 0; i <= longest; i++)
             {
                 rectangleList.Add(PutRectangle(first.X, first.Y, color));
+                //rectangleList.Add(PutRectangle(first.X, first.Y+1, color));
+                //rectangleList.Add(PutRectangle(first.X, first.Y-1, color));
                 numerator += shortest;
                 if (!(numerator < longest))
                 {

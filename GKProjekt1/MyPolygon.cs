@@ -374,7 +374,7 @@ namespace GKProjekt1
             var index = Edges.IndexOf(edge);
             var middleX = (edge.first.X + edge.second.X) / 2.0;
             var middleY = (edge.first.Y + edge.second.Y) / 2.0;
-            MyPoint middleVerticle = new MyPoint(middleX, middleY);
+            MyPoint middleVerticle = new MyPoint(middleX, middleY);            
             Draw.Verticle(middleVerticle, canvas);
             MyEdge secondHalf = new MyEdge(middleVerticle, edge.second);
             Draw.Edge(secondHalf, canvas);
