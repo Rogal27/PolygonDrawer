@@ -15,7 +15,8 @@ namespace GKProjekt1
     {
         public MyPoint first { get; set; }
         public MyPoint second { get; set; }
-        public Line line { get; set; }
+        //public Line line { get; set; }
+        public MyLine myLine { get; set; }
         public RelationIcon relationIcon { get; set; } = null;
         public RelationType relationType { get; set; } = RelationType.None;
         public MyEdge relationEdge { get; set; } = null;
@@ -26,24 +27,12 @@ namespace GKProjekt1
             this.second = second;
         }
 
-        public MyEdge(MyPoint first, MyPoint second, Line line)
-        {
-            this.first = first;
-            this.second = second;
-            this.line = line;
-        }
-
-        //BRESENHAM!
         public void MoveWithPoints()
         {
-            line.X1 = first.X;
-            line.Y1 = first.Y;
-            line.X2 = second.X;
-            line.Y2 = second.Y;
+            myLine.SetPoints(first, second);
             relationIcon?.MoveIcon();
         }
 
-        //BRESENHAM!
         public void MoveParallel(Point startPoint, Point endPoint)
         {
             var x = endPoint.X - startPoint.X;
@@ -57,7 +46,6 @@ namespace GKProjekt1
         {
             var x = Math.Min(first.X, second.X);
             var y = Math.Min(first.Y, second.Y);
-            //var newPoint = new Point(p.X - x, p.Y - y);
 
             if ((p.X + distance) > x &&
                 (p.Y + distance) > y &&
@@ -71,8 +59,44 @@ namespace GKProjekt1
                     return true;
             }
             return false;
+        }       
+
+        public double Length()
+        {
+            double x = first.X - second.X;
+            double y = first.Y - second.Y;
+            return Math.Sqrt(x * x + y * y);
         }
 
+        public void DeleteDrawing(Canvas canvas)
+        {
+            myLine.DeleteDrawing(canvas);
+        }
+
+        public void SelectEdge()
+        {
+            myLine.SelectEdge();
+        }
+
+        public void UnselectEdge()
+        {
+            myLine.UnselectEdge();
+        }
+
+        public void DeleteRelation()
+        {
+            if (relationType != RelationType.None)
+            {
+                relationIcon.Delete();
+                relationIcon = null;
+                relationEdge.relationIcon.Delete();
+                relationEdge.relationIcon = null;
+                relationType = RelationType.None;
+                relationEdge.relationType = RelationType.None;
+                relationEdge.relationEdge = null;
+                relationEdge = null;
+            }
+        }
         public static bool DoIntersect(MyEdge e1, MyEdge e2)
         {
             var d1 = MyPoint.VectorProduct((e2.second - e2.first), (e1.first - e2.first));
@@ -94,57 +118,6 @@ namespace GKProjekt1
                 MyPoint.OnRectangle(e2.first, e1.first, e1.second) ||
                 MyPoint.OnRectangle(e2.second, e1.first, e1.second);
         }
-
-        public double Length()
-        {
-            double x = first.X - second.X;
-            double y = first.Y - second.Y;
-            return Math.Sqrt(x * x + y * y);
-        }
-
-        //BRESENHAM!
-        public void SelectEdge()
-        {
-            var effect = new DropShadowEffect();
-            effect.BlurRadius = Globals.SelectedEdgeBlurRadius;
-            effect.Color = Globals.SelectedEdgeColor;
-            effect.Direction = 0;
-            effect.ShadowDepth = 0;
-            effect.Opacity = 0.9;
-            line.Stroke = new SolidColorBrush(Globals.SelectedEdgeColor);
-            line.Effect = effect;
-        }
-
-        //BRESENHAM!
-        public void UnselectEdge()
-        {
-            line.Stroke = new SolidColorBrush(Globals.DefaultEdgeColor);
-            line.Effect = null;
-        }
-
-        public void DeleteRelation()
-        {
-            if (relationType != RelationType.None)
-            {
-                relationIcon.Delete();
-                relationIcon = null;
-                relationEdge.relationIcon.Delete();
-                relationEdge.relationIcon = null;
-                relationType = RelationType.None;
-                relationEdge.relationType = RelationType.None;
-                relationEdge.relationEdge = null;
-                relationEdge = null;
-            }
-        }
-
-        //public MyEdge CopyWithouDrawing()
-        //{
-        //    MyEdge edge = new MyEdge(this.first.CopyWithoutDrawing(), this.second.CopyWithoutDrawing());
-        //    edge.relationType = this.relationType;
-        //    edge.relationEdge = null;
-        //    return edge;
-        //}
-
         public static bool operator ==(MyEdge e1, MyEdge e2)
         {
             if (e1.first == e2.first && e1.second == e2.second)
@@ -153,12 +126,10 @@ namespace GKProjekt1
                 return true;
             return false;
         }
-
         public static bool operator !=(MyEdge e1, MyEdge e2)
         {
             return !(e1 == e2);
         }
-
         public override bool Equals(object obj)
         {
             if (obj is MyEdge e)
@@ -167,7 +138,6 @@ namespace GKProjekt1
             }
             return false;
         }
-
         public override int GetHashCode()
         {
             return base.GetHashCode();

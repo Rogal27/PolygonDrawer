@@ -35,18 +35,19 @@ namespace GKProjekt1
         private object DragObject = null;
 
         //Drawing Variables
+        //BRESENHAM
         private bool PolygonDrawing = false;
         private MyPolygon CurrentlyDrawingPolygon = null;
         private int PolygonNumber = 0;
-        private Line CurrentLine = null;
+        private MyLine CurrentLine = null;
 
         //Adding Relation Variables
         private int RelationPolygonId = -1;
         private MyEdge RelationSelectedEdge = null;
 
-        
+
         public MainWindow()
-        {            
+        {
             InitializeComponent();
             Panel.SetZIndex(ButtonGridRow, Globals.ButtonsGridZIndex);
         }
@@ -56,11 +57,11 @@ namespace GKProjekt1
             Canvas currentCanvas = sender as Canvas;
             Point CurrentMousePosition = e.GetPosition(currentCanvas);
             MyPoint p = new MyPoint(CurrentMousePosition.X, CurrentMousePosition.Y);
-            
+
             switch (ProgramMode)
             {
                 case Mode.Pointer:
-                    {                       
+                    {
                         foreach (var pol in Polygons)
                         {
                             foreach (var edge in pol.Value.Edges)
@@ -73,9 +74,9 @@ namespace GKProjekt1
                                     DragPolygonId = pol.Key;
                                     DragObject = edge.first;
                                     return;
-                                }                                                       
+                                }
                             }
-                            foreach(var edge in pol.Value.Edges)
+                            foreach (var edge in pol.Value.Edges)
                             {
                                 //check if edge hit
                                 if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
@@ -110,10 +111,7 @@ namespace GKProjekt1
                             MyPolygon polygon = new MyPolygon(p, currentCanvas);
                             CurrentlyDrawingPolygon = polygon;
                             PolygonDrawing = true;
-                            if (CurrentLine != null)
-                            {
-                                currentCanvas.Children.Remove(CurrentLine);
-                            }
+                            CurrentLine?.DeleteDrawing(currentCanvas);
                             CurrentLine = Draw.SimpleEdge(CurrentMousePosition, CurrentMousePosition, currentCanvas);
                         }
                         else
@@ -122,12 +120,11 @@ namespace GKProjekt1
                             switch (DrawResult)
                             {
                                 case PolygonDrawResult.DrawFinished:
-                                    CurrentLine.X1 = CurrentMousePosition.X;
-                                    CurrentLine.Y1 = CurrentMousePosition.Y;
-                                    
+                                    CurrentLine.SetFirstPoint(CurrentMousePosition);
+
                                     Polygons.Add(PolygonNumber, CurrentlyDrawingPolygon);
 
-                                    currentCanvas.Children.Remove(CurrentLine);
+                                    CurrentLine.DeleteDrawing(currentCanvas);
                                     PolygonDrawing = false;
                                     CurrentlyDrawingPolygon = null;
                                     PolygonNumber++;
@@ -136,8 +133,7 @@ namespace GKProjekt1
                                     MessageBox.Show("Not enough edges to finish polygon", Globals.WindowName, MessageBoxButton.OK, MessageBoxImage.Warning);
                                     break;
                                 case PolygonDrawResult.DrawInProgress:
-                                    CurrentLine.X1 = CurrentMousePosition.X;
-                                    CurrentLine.Y1 = CurrentMousePosition.Y;
+                                    CurrentLine.SetFirstPoint(CurrentMousePosition);
                                     break;
                                 default:
                                     break;
@@ -202,7 +198,7 @@ namespace GKProjekt1
                                 if (edge.relationType == RelationType.None)
                                 {
                                     if (edge.IsNearPoint(CurrentMousePosition, Globals.LineClickDistance) == true)
-                                    {                                        
+                                    {
                                         if (Object.ReferenceEquals(edge, RelationSelectedEdge) == false)
                                         {
                                             edge.relationEdge = RelationSelectedEdge;
@@ -213,7 +209,7 @@ namespace GKProjekt1
                                             if (result == true)
                                             {
                                                 edge.relationIcon = new RelationIcon(edge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
-                                                RelationSelectedEdge.relationIcon = new RelationIcon(RelationSelectedEdge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);                                                
+                                                RelationSelectedEdge.relationIcon = new RelationIcon(RelationSelectedEdge, relationType, RelationPolygonId, Polygons[RelationPolygonId], currentCanvas);
                                             }
                                             else
                                             {
@@ -348,13 +344,12 @@ namespace GKProjekt1
                         {
                             if (CurrentLine != null)
                             {
-                                CurrentLine.X2 = CurrentMousePosition.X;
-                                CurrentLine.Y2 = CurrentMousePosition.Y;
+                                CurrentLine.SetSecondPoint(CurrentMousePosition);
                             }
                         }
                     }
                     break;
-                case Mode.AddMiddleVerticle:    
+                case Mode.AddMiddleVerticle:
                     {
                         foreach (var pol in Polygons)
                         {
@@ -387,7 +382,7 @@ namespace GKProjekt1
                                         return;
                                     }
                                 }
-                            }                            
+                            }
                         }
                         else
                         {
@@ -435,7 +430,7 @@ namespace GKProjekt1
                     break;
                 default:
                     break;
-            }            
+            }
         }
 
         private bool ClearUnfinishedPolygon()
@@ -454,7 +449,7 @@ namespace GKProjekt1
                     CurrentlyDrawingPolygon.DeleteDrawing();
                     if (CurrentLine != null)
                     {
-                        CurrentlyDrawingPolygon.canvas.Children.Remove(CurrentLine);
+                        CurrentLine.DeleteDrawing(CurrentlyDrawingPolygon.canvas);
                     }
                     CurrentLine = null;
                     CurrentlyDrawingPolygon = null;
@@ -475,11 +470,11 @@ namespace GKProjekt1
                     return false;
                 }
             }
-            else if(ProgramMode == Mode.AddEqualRelation || ProgramMode == Mode.AddPerpendicularRelation)
+            else if (ProgramMode == Mode.AddEqualRelation || ProgramMode == Mode.AddPerpendicularRelation)
             {
-                if(RelationPolygonId != -1)
+                if (RelationPolygonId != -1)
                 {
-                    RelationSelectedEdge.UnselectEdge();                    
+                    RelationSelectedEdge.UnselectEdge();
                 }
                 RelationSelectedEdge = null;
                 RelationPolygonId = -1;
@@ -496,9 +491,9 @@ namespace GKProjekt1
         {
             //delete currently drawing polygon
             CurrentlyDrawingPolygon?.DeleteDrawing();
-            if (CurrentLine != null)
+            if (CurrentlyDrawingPolygon != null)
             {
-                CurrentlyDrawingPolygon?.canvas.Children.Remove(CurrentLine);
+                CurrentLine?.DeleteDrawing(CurrentlyDrawingPolygon.canvas);
             }
             CurrentLine = null;
             CurrentlyDrawingPolygon = null;
@@ -595,7 +590,7 @@ namespace GKProjekt1
             var result = MessageBox.Show("Are you sure?", Globals.WindowName, MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
-                ClearAll();                
+                ClearAll();
             }
         }
         private void GenerateSamplePolygon_Click(object sender, RoutedEventArgs e)
