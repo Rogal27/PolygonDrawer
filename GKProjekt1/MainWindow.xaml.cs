@@ -111,7 +111,7 @@ namespace GKProjekt1
                             MyPolygon polygon = new MyPolygon(p, currentCanvas);
                             CurrentlyDrawingPolygon = polygon;
                             PolygonDrawing = true;
-                            CurrentLine?.DeleteDrawing(currentCanvas);
+                            CurrentLine?.DeleteDrawing();
                             CurrentLine = Draw.SimpleEdge(CurrentMousePosition, CurrentMousePosition, currentCanvas);
                         }
                         else
@@ -124,7 +124,7 @@ namespace GKProjekt1
 
                                     Polygons.Add(PolygonNumber, CurrentlyDrawingPolygon);
 
-                                    CurrentLine.DeleteDrawing(currentCanvas);
+                                    CurrentLine.DeleteDrawing();
                                     PolygonDrawing = false;
                                     CurrentlyDrawingPolygon = null;
                                     PolygonNumber++;
@@ -447,7 +447,7 @@ namespace GKProjekt1
                 else
                 {
                     CurrentlyDrawingPolygon.DeleteDrawing();
-                    CurrentLine?.DeleteDrawing(CurrentlyDrawingPolygon.canvas);
+                    CurrentLine?.DeleteDrawing();
                     CurrentLine = null;
                     CurrentlyDrawingPolygon = null;
                     PolygonDrawing = false;
@@ -490,7 +490,7 @@ namespace GKProjekt1
             CurrentlyDrawingPolygon?.DeleteDrawing();
             if (CurrentlyDrawingPolygon != null)
             {
-                CurrentLine?.DeleteDrawing(CurrentlyDrawingPolygon.canvas);
+                CurrentLine?.DeleteDrawing();
             }
             CurrentLine = null;
             CurrentlyDrawingPolygon = null;
