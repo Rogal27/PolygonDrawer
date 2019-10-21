@@ -42,7 +42,9 @@ namespace GKProjekt1
                 };
                 Panel.SetZIndex(line, Globals.LineZIndex);
                 canvas.Children.Add(line);
-                edge.line = line;
+                MyLine myLine = new MyLine();
+                myLine.lineWindowsControl = line;
+                edge.myLine = myLine;
             }
             else
             {
@@ -51,7 +53,7 @@ namespace GKProjekt1
             }
         }
 
-        public static Line SimpleEdge(Point first, Point second, Canvas canvas)//used to draw temporary lines
+        public static MyLine SimpleEdge(Point first, Point second, Canvas canvas)//used to draw temporary lines
         {
             if (Globals.__BresenhamOff__ == true)
             {
@@ -66,7 +68,9 @@ namespace GKProjekt1
                 };
                 Panel.SetZIndex(line, Globals.LineZIndex);
                 canvas.Children.Add(line);
-                return line;
+                MyLine myLine = new MyLine();
+                myLine.lineWindowsControl = line;
+                return myLine;
             }
             else
             {
