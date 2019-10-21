@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace GKProjekt1
@@ -14,9 +17,7 @@ namespace GKProjekt1
     public class MyLine
     {
         public Line lineWindowsControl { get; set; }
-
-        public List<Rectangle> rectangleLine { get; set; } = new List<Rectangle>();
-
+        public Image lineBresenham { get; set; }
         public Point firstPoint { get; set; }
         public Point secondPoint { get; set; }
         public Canvas canvas { get; set; }
@@ -65,19 +66,8 @@ namespace GKProjekt1
             }
             else
             {
-                Vector v1 = new Vector(firstPoint.X - second.X, firstPoint.Y - second.Y);
-                if (v1.X < Globals.eps && v1.Y < Globals.eps)
-                {
-                    secondPoint = second;
-                    DrawLine(Globals.DefaultEdgeColor);
-                }
-                else
-                {
-                    v1.Normalize();
-                    Point newSecond = new Point(second.X + 5 * v1.X, second.Y + 5 * v1.Y);
-                    secondPoint = newSecond;
-                    DrawLine(Globals.DefaultEdgeColor);
-                }
+                secondPoint = second;
+                DrawLine(Globals.DefaultEdgeColor);
             }
         }
 
@@ -113,36 +103,6 @@ namespace GKProjekt1
             }
         }
 
-        private void ShowLine()
-        {
-            if (Globals.__BresenhamOff__ == true)
-            {
-                return;
-            }
-            else
-            {
-                foreach (var pixel in rectangleLine)
-                {
-                    canvas.Children.Add(pixel);
-                }
-            }
-        }
-
-        public void DrawLine(Color color)
-        {
-            if (Globals.__BresenhamOff__ == true)
-            {
-                return;
-            }
-            else
-            {
-                DeleteDrawing();
-                rectangleLine = BresenhamLine(firstPoint, secondPoint, color);
-                ShowLine();
-            }            
-        }
-
-        //make this function argumentless
         public void DeleteDrawing()
         {
             if (Globals.__BresenhamOff__ == true)
@@ -151,17 +111,13 @@ namespace GKProjekt1
             }
             else
             {
-                foreach (var pixel in rectangleLine)
-                {
-                    canvas.Children.Remove(pixel);
-                }
-                rectangleLine.Clear();
+                canvas.Children.Remove(lineBresenham);
             }
         }
 
-        public static List<Rectangle> BresenhamLine(Point first, Point second, Color color)
+        public static List<SimplePoint> BresenhamLine(Point first, Point second)
         {
-            List<Rectangle> rectangleList = new List<Rectangle>();
+            List<SimplePoint> rectangleList = new List<SimplePoint>();
 
             //not my bresenham!!!!
             int w = (int)(second.X - first.X);
@@ -182,7 +138,8 @@ namespace GKProjekt1
             int numerator = longest >> 1;
             for (int i = 0; i <= longest; i++)
             {
-                rectangleList.Add(PutRectangle(first.X, first.Y, color));
+                rectangleList.Add(new SimplePoint(first.X, first.Y));
+                //rectangleList.Add(PutRectangle(first.X, first.Y, color));
                 //rectangleList.Add(PutRectangle(first.X, first.Y+1, color));
                 //rectangleList.Add(PutRectangle(first.X, first.Y-1, color));
                 numerator += shortest;
@@ -202,18 +159,80 @@ namespace GKProjekt1
             return rectangleList;
         }
 
-        public static Rectangle PutRectangle(double X, double Y, Color color)
+        //public static Rectangle PutRectangle(double X, double Y, Color color)
+        //{
+        //    Rectangle rectangle = new Rectangle
+        //    {
+        //        Width = 1.0,
+        //        Height = 1.0,
+        //        Fill = new SolidColorBrush(color)
+        //    };
+        //    Canvas.SetLeft(rectangle, X);
+        //    Canvas.SetTop(rectangle, Y);
+        //    Panel.SetZIndex(rectangle, Globals.LineZIndex);
+        //    return rectangle;
+        //}
+
+        public void DrawLine(Color color)
         {
-            Rectangle rectangle = new Rectangle
+            if (Globals.__BresenhamOff__ == true)
+                return;
+
+            List<SimplePoint> pointsList = BresenhamLine(firstPoint, secondPoint);
+
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext dc = dv.RenderOpen())
             {
-                Width = 1.0,
-                Height = 1.0,
-                Fill = new SolidColorBrush(color)
-            };
-            Canvas.SetLeft(rectangle, X);
-            Canvas.SetTop(rectangle, Y);
-            Panel.SetZIndex(rectangle, Globals.LineZIndex);
-            return rectangle;
+                Brush brush = new SolidColorBrush(color);
+
+                foreach (var point in pointsList)
+                {
+                    Rect rect = new Rect(point.X, point.Y, 1, 1);
+                    dc.DrawRectangle(brush, null, rect);
+                }
+
+            }
+            RenderTargetBitmap rtb = new RenderTargetBitmap((int)canvas.ActualWidth, (int)canvas.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            rtb.Render(dv);
+
+            Image img = new Image();
+            img.Source = rtb;
+
+            img.IsHitTestVisible = false;
+            
+            canvas.Children.Add(img);
+
+            Panel.SetZIndex(img, Globals.LineZIndex);
+            canvas.Children.Remove(lineBresenham);
+            lineBresenham = img;
         }
+
+        //private void DrawRubbish2()
+        //{
+        //    DrawingVisual dv = new DrawingVisual();
+        //    using (DrawingContext dc = dv.RenderOpen())
+        //    {
+        //        Random rand = new Random();
+
+        //        for (int i = 0; i < 200; i++)
+        //            dc.DrawRectangle(Brushes.Red, null, new Rect(rand.NextDouble() * 200, rand.NextDouble() * 200, 1, 1));
+
+        //        dc.Close();
+        //    }
+        //    RenderTargetBitmap rtb = new RenderTargetBitmap(200, 200, 96, 96, PixelFormats.Pbgra32);
+        //    rtb.Render(dv);
+        //    Image img = new Image();
+        //    img.Source = rtb;
+        //    canvas.Children.Add(img);
+        //}
+
+        //private void RectangleInCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    var rect = sender as Image;
+        //    Point p = e.GetPosition(rect);
+        //    Debug.WriteLine($"Hit: ({p.X};{p.Y})");
+        //}
+
+
     }
 }

@@ -50,6 +50,7 @@ namespace GKProjekt1
         {
             InitializeComponent();
             Panel.SetZIndex(ButtonGridRow, Globals.ButtonsGridZIndex);
+            //Panel.SetZIndex(PolygonCanvas, Globals.CanvasZIndex);
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -637,5 +638,11 @@ namespace GKProjekt1
                     break;
             }
         }
+
+        //private void RectangleInCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    Point p = e.GetPosition(RectangleInCanvas);
+        //    Debug.WriteLine($"Hit: ({p.X};{p.Y})");
+        //}
     }
 }
