@@ -346,7 +346,7 @@ namespace GKProjekt1
                         previousEdge.MoveWithPoints();
 
                         canvas.Children.Remove(edge.first.ellipse);
-                        canvas.Children.Remove(edge.line);
+                        edge.DeleteDrawing(canvas);
 
                         Edges.Remove(edge);
 
@@ -572,7 +572,7 @@ namespace GKProjekt1
             foreach (var edge in Edges)
             {
                 edge.DeleteRelation();
-                canvas.Children.Remove(edge.line);
+                edge.DeleteDrawing(canvas);
                 canvas.Children.Remove(edge.first.ellipse);
                 canvas.Children.Remove(edge.second.ellipse);
             }

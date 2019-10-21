@@ -447,10 +447,7 @@ namespace GKProjekt1
                 else
                 {
                     CurrentlyDrawingPolygon.DeleteDrawing();
-                    if (CurrentLine != null)
-                    {
-                        CurrentLine.DeleteDrawing(CurrentlyDrawingPolygon.canvas);
-                    }
+                    CurrentLine?.DeleteDrawing(CurrentlyDrawingPolygon.canvas);
                     CurrentLine = null;
                     CurrentlyDrawingPolygon = null;
                     PolygonDrawing = false;
