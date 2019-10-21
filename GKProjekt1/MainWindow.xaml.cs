@@ -607,7 +607,6 @@ namespace GKProjekt1
                 GenerateSamplePolygon();
             }
         }
-
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
