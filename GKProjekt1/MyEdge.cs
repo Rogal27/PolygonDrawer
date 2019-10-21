@@ -70,7 +70,7 @@ namespace GKProjekt1
 
         public void DeleteDrawing(Canvas canvas)
         {
-            myLine.DeleteDrawing(canvas);
+            myLine.DeleteDrawing();
         }
 
         public void SelectEdge()

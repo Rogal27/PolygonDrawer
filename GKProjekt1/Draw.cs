@@ -44,12 +44,18 @@ namespace GKProjekt1
                 canvas.Children.Add(line);
                 MyLine myLine = new MyLine();
                 myLine.lineWindowsControl = line;
+                myLine.canvas = canvas;
                 edge.myLine = myLine;
             }
             else
             {
+                MyLine myLine = new MyLine();
+                myLine.firstPoint = new Point(edge.first.X, edge.first.Y);
+                myLine.secondPoint = new Point(edge.second.X, edge.second.Y);
+                myLine.canvas = canvas;
+
                 //algorytm Bresenhama
-                //return null;
+                myLine.DrawLine(Globals.DefaultEdgeColor);
             }
         }
 
@@ -70,13 +76,22 @@ namespace GKProjekt1
                 canvas.Children.Add(line);
                 MyLine myLine = new MyLine();
                 myLine.lineWindowsControl = line;
+                myLine.canvas = canvas;
                 return myLine;
             }
             else
             {
+                MyLine myLine = new MyLine();
+                myLine.firstPoint = first;
+                myLine.secondPoint = second;
+                myLine.canvas = canvas;
+
                 //algorytm Bresenhama
-                return null;
+                myLine.DrawLine(Globals.DefaultEdgeColor);
+                
+                return myLine;
             }
         }
+
     }
 }
