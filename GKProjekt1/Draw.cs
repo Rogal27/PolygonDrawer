@@ -29,7 +29,7 @@ namespace GKProjekt1
 
         public static void Edge(MyEdge edge, Canvas canvas)
         {
-            if (Globals.__Test__ == true)
+            if (Globals.__BresenhamOff__ == true)
             {
                 Line line = new Line()
                 {
@@ -53,7 +53,7 @@ namespace GKProjekt1
 
         public static Line SimpleEdge(Point first, Point second, Canvas canvas)//used to draw temporary lines
         {
-            if (Globals.__Test__ == true)
+            if (Globals.__BresenhamOff__ == true)
             {
                 Line line = new Line()
                 {
