@@ -37,6 +37,6 @@ namespace GKProjekt1
         //relation text
         public static int RelationFontSize = 16;
         //Math
-        public static double eps = 1e-9;
+        public static double eps = 1e-3;
     }
 }

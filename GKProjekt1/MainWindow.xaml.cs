@@ -542,31 +542,53 @@ namespace GKProjekt1
         private void PointerMode_Click(object sender, RoutedEventArgs e)
         {
             if (DoesUserWantToChangeMode(sender) == true)
+            {
                 ProgramMode = Mode.Pointer;
+                var button = sender as RadioButton;
+                button.IsChecked = true;
+            }
         }
         private void DrawMode_Click(object sender, RoutedEventArgs e)
         {
             ProgramMode = Mode.Draw;
+            var button = sender as RadioButton;
+            button.IsChecked = true;
         }
         private void DeleteMode_Click(object sender, RoutedEventArgs e)
         {
             if (DoesUserWantToChangeMode(sender) == true)
+            {
                 ProgramMode = Mode.DeleteVerticleOrRelation;
+                var button = sender as RadioButton;
+                button.IsChecked = true;
+            }
         }
         private void AddMiddleVerticleMode_Click(object sender, RoutedEventArgs e)
         {
             if (DoesUserWantToChangeMode(sender) == true)
+            {
                 ProgramMode = Mode.AddMiddleVerticle;
+                var button = sender as RadioButton;
+                button.IsChecked = true;
+            }
         }
         private void AddEqualRelationMode_Click(object sender, RoutedEventArgs e)
         {
             if (DoesUserWantToChangeMode(sender) == true)
+            {
                 ProgramMode = Mode.AddEqualRelation;
+                var button = sender as RadioButton;
+                button.IsChecked = true;
+            }
         }
         private void AddPerpendicularRelationMode_Click(object sender, RoutedEventArgs e)
         {
             if (DoesUserWantToChangeMode(sender) == true)
+            {
                 ProgramMode = Mode.AddPerpendicularRelation;
+                var button = sender as RadioButton;
+                button.IsChecked = true;
+            }
         }
         private void ClearAll_Click(object sender, RoutedEventArgs e)
         {
@@ -584,6 +606,39 @@ namespace GKProjekt1
                 ClearAll();
                 GenerateSamplePolygon();
             }
-        }        
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.D1:
+                    PointerMode_Click(PointerButton, null);
+                    break;
+                case Key.D2:
+                    DrawMode_Click(DrawButton, null);
+                    break;
+                case Key.D3:
+                    AddEqualRelationMode_Click(AddEqualRelationButton, null);
+                    break;
+                case Key.D4:
+                    AddPerpendicularRelationMode_Click(AddPerpendicularRelationButton, null);
+                    break;
+                case Key.D5:
+                    AddMiddleVerticleMode_Click(AddMiddleVerticleButton, null);
+                    break;
+                case Key.D6:
+                    DeleteMode_Click(DeleteButton, null);
+                    break;
+                case Key.D9:
+                    GenerateSamplePolygon_Click(GenerateSamplePolygonButton, null);
+                    break;
+                case Key.D0:
+                    ClearAll_Click(ClearAllButton, null);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
