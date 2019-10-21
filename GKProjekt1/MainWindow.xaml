@@ -76,8 +76,10 @@
                 <TextBlock Text="Clear All&#10;(0)"/>
             </Button>
         </Grid>
-        <Canvas Grid.Row="1" Name="PolygonCanvas" Background="White" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="PolygonCanvas_MouseMove" MouseLeftButtonUp="Canvas_MouseLeftButtonUp" >
-            
+        <Canvas Grid.Row="1" Name="PolygonCanvas" Background="Transparent" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="PolygonCanvas_MouseMove" MouseLeftButtonUp="Canvas_MouseLeftButtonUp" >
+            <!--<Rectangle x:Name="RectangleInCanvas"  Canvas.ZIndex="200" MouseLeftButtonDown="RectangleInCanvas_MouseLeftButtonDown" 
+                       Width="{Binding Source=PolygonCanvas, Path=ActualWidth}"
+                       Height="{Binding Source=PolygonCanvas, Path=ActualHeight}"/>-->
         </Canvas>
         
     </Grid>

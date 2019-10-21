@@ -18,6 +18,8 @@ namespace GKProjekt1
         public static Color RelationFontColor = Color.FromRgb(255, 0, 0);
         //buttons grid
         public static int ButtonsGridZIndex = 100;
+        //canvas
+        public static int CanvasZIndex = 150;
         //verticle
         public static int VerticleSize = 10;
         public static int VerticleClickRadiusSize = 15;
