@@ -269,11 +269,13 @@ namespace GKProjekt1
         {
             if (ProgramMode == Mode.Pointer)
             {
+                Canvas currentCanvas = sender as Canvas;
                 CurrentDragObjectType = DragObjectType.Nothing;
                 IsDraggingOn = false;
                 DragPolygonId = -1;
                 DragObject = null;
                 DragStartingPoint = new Point();
+                currentCanvas.Cursor = Cursors.Arrow;
             }
         }
 

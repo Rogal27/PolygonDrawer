@@ -54,7 +54,7 @@ namespace GKProjekt1
                 Edges.Add(e);
                 return PolygonDrawResult.DrawInProgress;
             }
-        }       
+        }
 
         //BRESENHAM!
         public void MoveVerticle(MyPoint verticle, Point endPoint)
@@ -92,31 +92,17 @@ namespace GKProjekt1
                 RedrawPolygon(changedPolygon);
             }
             return success;
-        }        
+        }
 
-        //unfinished
-        private (bool success,MyPolygon changedPolygon) FixRelationsMovingVerticle(MyEdge startingEdge)
+        //private  bool()
+
+        private (bool success, MyPolygon changedPolygon) FixRelationsMovingVerticle(MyEdge startingEdge)
         {
             MyPolygon copyPolygon = this.CopyWithoutDrawing();
             var startingEdgeIndex = copyPolygon.Edges.FindIndex(x => x == startingEdge);
             bool endLoop = false;
             bool firstSuccess = false;
             bool secondSuccess = false;
-
-            MyEdge relationEdge;
-            double length;
-            double relationEdgeLength;
-            double vectorX;
-            double vectorY;
-            double scale;
-
-            Vector v1 = new Vector();
-            Vector v2 = new Vector();
-            Point APoint = new Point();
-            Point BPoint = new Point();
-            Point CPoint = new Point();
-            Point DPoint = new Point();
-            Point? intersection;
 
             //going right (list order)
             for (int i = 0; i < copyPolygon.Edges.Count && endLoop == false; i++)
@@ -125,81 +111,10 @@ namespace GKProjekt1
                 switch (edge.relationType)
                 {
                     case RelationType.Equal:
-                        {
-                            //moving second verticle
-                            relationEdge = edge.relationEdge;
-                            length = edge.Length();
-                            relationEdgeLength = relationEdge.Length();
-                            if (length < Globals.eps || relationEdgeLength < Globals.eps)
-                            {
-                                endLoop = true;
-                                firstSuccess = true;
-                                break;
-                            }
-                            if (Math.Abs(relationEdgeLength - length) < Globals.eps)
-                            {
-                                break;
-                            }
-                            vectorX = edge.second.X - edge.first.X;
-                            vectorY = edge.second.Y - edge.first.Y;
-                            scale = relationEdgeLength / length;
-                            vectorX *= scale;
-                            vectorY *= scale;
-                            edge.second.X = edge.first.X + vectorX;
-                            edge.second.Y = edge.first.Y + vectorY;
-                            //Debug.WriteLine($"Edge second: ({edge.second.X};{edge.second.Y})");
-                        }
+                        RelationFixer.FixEqualRelation(edge.first, edge.second, edge, ref endLoop, ref firstSuccess);
                         break;
                     case RelationType.Perpendicular:
-                        {
-                            //moving second verticle
-                            relationEdge = edge.relationEdge;
-
-                            v1.X = relationEdge.second.X - relationEdge.first.X;
-                            v1.Y = relationEdge.second.Y - relationEdge.first.Y;
-                            v2.X = relationEdge.second.Y - relationEdge.first.Y;
-                            v2.Y = relationEdge.first.X - relationEdge.second.X;
-
-                            APoint.X = edge.first.X;
-                            APoint.Y = edge.first.Y;
-                            BPoint = APoint + v2;
-                            CPoint.X = edge.second.X;
-                            CPoint.Y = edge.second.Y;
-                            DPoint = CPoint + v1;
-
-                            intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
-
-                            if (intersection.HasValue == true)
-                            {
-                                edge.second.X = intersection.Value.X;
-                                edge.second.Y = intersection.Value.Y;
-                            }
-                            else
-                            {
-                                edge.first.X += 5.0;
-                                edge.first.Y += 5.0;
-
-                                v1.X = relationEdge.second.X - relationEdge.first.X;
-                                v1.Y = relationEdge.second.Y - relationEdge.first.Y;
-                                v2.X = relationEdge.second.Y - relationEdge.first.Y;
-                                v2.Y = relationEdge.first.X - relationEdge.second.X;
-
-                                APoint.X = edge.first.X;
-                                APoint.Y = edge.first.Y;
-                                BPoint = APoint + v2;
-                                CPoint.X = edge.second.X;
-                                CPoint.Y = edge.second.Y;
-                                DPoint = CPoint + v1;
-
-                                intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
-
-                                if (intersection.HasValue == true)
-                                {
-                                    edge.second.X = intersection.Value.X;
-                                    edge.second.Y = intersection.Value.Y;
-                                }
-                            }
-                        }
+                        RelationFixer.FixPerpendicularRelation(edge.first, edge.second, edge.relationEdge.first, edge.relationEdge.second);
                         break;
                     case RelationType.None:
                         endLoop = true;
@@ -222,79 +137,10 @@ namespace GKProjekt1
                 switch (edge.relationType)
                 {
                     case RelationType.Equal:
-                        {
-                            //moving second verticle
-                            relationEdge = edge.relationEdge;
-                            length = edge.Length();
-                            relationEdgeLength = relationEdge.Length();
-                            if (length < Globals.eps || relationEdgeLength < Globals.eps)
-                            {
-                                endLoop = true;
-                                secondSuccess = true;
-                                break;
-                            }
-                            if (Math.Abs(relationEdgeLength - length) < Globals.eps)
-                            {
-                                break;
-                            }
-                            vectorX = edge.first.X - edge.second.X;
-                            vectorY = edge.first.Y - edge.second.Y;
-                            scale = relationEdgeLength / length;
-                            vectorX *= scale;
-                            vectorY *= scale;
-                            edge.first.X = edge.second.X + vectorX;
-                            edge.first.Y = edge.second.Y + vectorY;
-                        }
+                        RelationFixer.FixEqualRelation(edge.second, edge.first, edge, ref endLoop, ref secondSuccess);
                         break;
                     case RelationType.Perpendicular:
-                        {
-                            relationEdge = edge.relationEdge;
-
-                            v1.X = relationEdge.first.X - relationEdge.second.X;
-                            v1.Y = relationEdge.first.Y - relationEdge.second.Y;
-                            v2.X = relationEdge.first.Y - relationEdge.second.Y;
-                            v2.Y = relationEdge.second.X - relationEdge.first.X;
-
-                            APoint.X = edge.second.X;
-                            APoint.Y = edge.second.Y;
-                            BPoint = APoint + v2;
-                            CPoint.X = edge.first.X;
-                            CPoint.Y = edge.first.Y;
-                            DPoint = CPoint + v1;
-
-                            intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
-
-                            if (intersection.HasValue == true)
-                            {
-                                edge.first.X = intersection.Value.X;
-                                edge.first.Y = intersection.Value.Y;
-                            }
-                            else
-                            {
-                                edge.second.X += 5.0;
-                                edge.second.Y += 5.0;
-
-                                v1.X = relationEdge.first.X - relationEdge.second.X;
-                                v1.Y = relationEdge.first.Y - relationEdge.second.Y;
-                                v2.X = relationEdge.first.Y - relationEdge.second.Y;
-                                v2.Y = relationEdge.second.X - relationEdge.first.X;
-
-                                APoint.X = edge.second.X;
-                                APoint.Y = edge.second.Y;
-                                BPoint = APoint + v2;
-                                CPoint.X = edge.first.X;
-                                CPoint.Y = edge.first.Y;
-                                DPoint = CPoint + v1;
-
-                                intersection = PointExtension.IntersectionPoint(APoint, BPoint, CPoint, DPoint);
-
-                                if (intersection.HasValue == true)
-                                {
-                                    edge.first.X = intersection.Value.X;
-                                    edge.first.Y = intersection.Value.Y;
-                                }
-                            }
-                        }
+                        RelationFixer.FixPerpendicularRelation(edge.second, edge.first, edge.relationEdge.second, edge.relationEdge.first);
                         break;
                     case RelationType.None:
                         endLoop = true;
@@ -309,12 +155,9 @@ namespace GKProjekt1
                 if (CheckIfRelationsAreOK(copyPolygon) == false)
                     return (false, null);
             }
-
-
-            return (true,copyPolygon);
+            return (true, copyPolygon);
         }
 
-        //BRESENHAM!
         private void RedrawPolygon(MyPolygon polygon)
         {
             for (int i = 0; i < Edges.Count; i++)
@@ -323,13 +166,12 @@ namespace GKProjekt1
                 var newEdge = polygon.Edges[i];
                 edge.first.Move(newEdge.first.X, newEdge.first.Y);
             }
-            foreach(var edge in Edges)
+            foreach (var edge in Edges)
             {
                 edge.MoveWithPoints();
             }
         }
 
-        //BRESENHAM
         public bool DeleteVerticle(MyPoint verticle)
         {
             if (Edges.Count > 3)
@@ -367,14 +209,13 @@ namespace GKProjekt1
             return false;
         }
 
-        //BRESENHAM!
         public void AddMiddleVerticleOnEdge(MyEdge edge)
         {
             edge.DeleteRelation();
             var index = Edges.IndexOf(edge);
             var middleX = (edge.first.X + edge.second.X) / 2.0;
             var middleY = (edge.first.Y + edge.second.Y) / 2.0;
-            MyPoint middleVerticle = new MyPoint(middleX, middleY);            
+            MyPoint middleVerticle = new MyPoint(middleX, middleY);
             Draw.Verticle(middleVerticle, canvas);
             MyEdge secondHalf = new MyEdge(middleVerticle, edge.second);
             Draw.Edge(secondHalf, canvas);
@@ -383,17 +224,11 @@ namespace GKProjekt1
             Edges.Insert(index + 1, secondHalf);
         }
 
-        //BRESENHAM!
         public void MoveEdgeParallel(MyEdge edge, ref Point startPoint, ref Point endPoint)
         {
             var startPointCopy = new Point(startPoint.X, startPoint.Y);
             var endPointCopy = new Point(endPoint.X, endPoint.Y);
-            //var edgeIndex = Edges.IndexOf(edge);
-            //if (edgeIndex == -1)
-            //    return;
-            //int edgesCount = Edges.Count;
-            //var previousEdge2 = Edges[(edgeIndex - 1 + edgesCount) % edgesCount];
-            //var nextEdge2 = Edges[(edgeIndex + 1 + edgesCount) % edgesCount];
+
             edge.MoveParallel(startPoint, endPoint);
             var result = ApplyRelationChanges(edge);
             startPoint = endPoint;
@@ -403,12 +238,8 @@ namespace GKProjekt1
                 startPoint = startPointCopy;
                 endPoint = endPointCopy;
             }
-            
-            //previousEdge2.MoveWithPoints();
-            //nextEdge2.MoveWithPoints();
         }
 
-        //BRESENHAM!
         public void MovePolygon(ref Point startPoint, ref Point endPoint)
         {
             var offsetX = endPoint.X - startPoint.X;
@@ -437,13 +268,9 @@ namespace GKProjekt1
             //Edges.Insert(1, myEdge1);
 
             List<MyEdge> ClearEdges = RemoveCollinearEdges();
-            //TODO:
-            //implement algorithm
-            //Debug.WriteLine($"Canvas actualwidth: {canvas.ActualWidth}");
-            //Debug.WriteLine($"Canvas width: {canvas.Width}");
+
             MyEdge Ray = new MyEdge(new MyPoint(p.X, p.Y), new MyPoint(p.X + canvas.ActualWidth, p.Y));
             int intersectCounter = 0;
-            //var previousEdge = ClearEdges.Last();
 
             for (int i = 0; i < ClearEdges.Count; i++)
             {
@@ -468,7 +295,7 @@ namespace GKProjekt1
                     else if (firstCollinear == true)
                     {
                         //if previousEdge.first i edge.second leza
-                        //po przeciwnych stronach polprostej Ray to intersectCounter++
+                        //po przeciwnych stronach polprostej Ray to intersectCounter++ i i++
                         if ((previousEdge.first.Y > Ray.first.Y && edge.second.Y < Ray.first.Y) ||
                                 (previousEdge.first.Y < Ray.first.Y && edge.second.Y > Ray.first.Y))
                         {
@@ -479,7 +306,7 @@ namespace GKProjekt1
                     else if (secondCollinear == true)
                     {
                         //if edge.first i nextEdge.second leza
-                        //po przeciwnych stronach polprostej Ray to intersectCounter++
+                        //po przeciwnych stronach polprostej Ray to intersectCounter++ i i++
                         if ((edge.first.Y > Ray.first.Y && nextEdge.second.Y < Ray.first.Y) ||
                             (edge.first.Y < Ray.first.Y && nextEdge.second.Y > Ray.first.Y))
                         {
@@ -492,15 +319,13 @@ namespace GKProjekt1
                         intersectCounter++;
                     }
                 }
-                previousEdge = edge;
             }
             return intersectCounter % 2 == 1;
-        }       
+        }
 
         private List<MyEdge> RemoveCollinearEdges()
         {
             List<MyEdge> ClearEdges = new List<MyEdge>();
-            //var nextEdge = Edges.Last();
             MyEdge tmpEdge = null;
             MyEdge edge = null;
             bool AreCollinear = false;
@@ -566,7 +391,6 @@ namespace GKProjekt1
             return p;
         }
 
-        //BRESENHAM!
         public void DeleteDrawing()
         {
             foreach (var edge in Edges)
@@ -614,7 +438,7 @@ namespace GKProjekt1
                         break;
                 }
             }
-            return false;
+            return true;
         }
     }
 }

@@ -62,6 +62,7 @@
     <Compile Include="Globals.cs" />
     <Compile Include="MyLine.cs" />
     <Compile Include="MyPoint.cs" />
+    <Compile Include="RelationFixer.cs" />
     <Compile Include="SimplePoint.cs" />
     <Compile Include="PointExtension.cs" />
     <Compile Include="PolygonDrawResult.cs" />
