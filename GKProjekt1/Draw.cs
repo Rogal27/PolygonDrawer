@@ -49,10 +49,10 @@ namespace GKProjekt1
             }
             else
             {
-                MyLine myLine = new MyLine();
+                MyLine myLine = new MyLine(canvas);
                 myLine.firstPoint = new Point(edge.first.X, edge.first.Y);
                 myLine.secondPoint = new Point(edge.second.X, edge.second.Y);
-                myLine.canvas = canvas;
+                //myLine.canvas = canvas;
                 edge.myLine = myLine;
 
                 //algorytm Bresenhama
@@ -82,11 +82,11 @@ namespace GKProjekt1
             }
             else
             {
-                MyLine myLine = new MyLine();
+                MyLine myLine = new MyLine(canvas);
 
                 myLine.firstPoint = first;
                 myLine.secondPoint = second;
-                myLine.canvas = canvas;
+                //myLine.canvas = canvas;
 
                 //algorytm Bresenhama
                 myLine.DrawLine(Globals.DefaultEdgeColor);

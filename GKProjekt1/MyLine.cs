@@ -24,6 +24,21 @@ namespace GKProjekt1
 
         public MyLine()
         {
+
+        }
+        public MyLine(Canvas canvas)
+        {
+            if (Globals.__BresenhamOff__ == true)
+            {
+            }
+            else
+            {
+                lineBresenham = new Image();
+                lineBresenham.IsHitTestVisible = false;
+                Panel.SetZIndex(lineBresenham, Globals.LineZIndex);
+                this.canvas = canvas;
+                this.canvas.Children.Add(lineBresenham);
+            }
         }
 
         public void SetPoints(MyPoint first, MyPoint second)
@@ -111,7 +126,8 @@ namespace GKProjekt1
             }
             else
             {
-                canvas.Children.Remove(lineBresenham);
+                //canvas.Children.Remove(lineBresenham);
+                lineBresenham.Source = null;
             }
         }
 
@@ -179,7 +195,7 @@ namespace GKProjekt1
                 return;
 
             List<SimplePoint> pointsList = BresenhamLine(firstPoint, secondPoint);
-
+            
             DrawingVisual dv = new DrawingVisual();
             using (DrawingContext dc = dv.RenderOpen())
             {
@@ -195,16 +211,16 @@ namespace GKProjekt1
             RenderTargetBitmap rtb = new RenderTargetBitmap((int)canvas.ActualWidth, (int)canvas.ActualHeight, 96, 96, PixelFormats.Pbgra32);
             rtb.Render(dv);
 
-            Image img = new Image();
-            img.Source = rtb;
+            //Image img = new Image();
+            lineBresenham.Source = rtb;
 
-            img.IsHitTestVisible = false;
+            //img.IsHitTestVisible = false;
             
-            canvas.Children.Add(img);
+            //canvas.Children.Add(img);
 
-            Panel.SetZIndex(img, Globals.LineZIndex);
-            canvas.Children.Remove(lineBresenham);
-            lineBresenham = img;
+            
+            //canvas.Children.Remove(lineBresenham);
+            //lineBresenham = img;
         }
 
         //private void DrawRubbish2()
