@@ -126,7 +126,6 @@ namespace GKProjekt1
             }
             else
             {
-                //canvas.Children.Remove(lineBresenham);
                 lineBresenham.Source = null;
             }
         }
@@ -155,9 +154,6 @@ namespace GKProjekt1
             for (int i = 0; i <= longest; i++)
             {
                 rectangleList.Add(new SimplePoint(first.X, first.Y));
-                //rectangleList.Add(PutRectangle(first.X, first.Y, color));
-                //rectangleList.Add(PutRectangle(first.X, first.Y+1, color));
-                //rectangleList.Add(PutRectangle(first.X, first.Y-1, color));
                 numerator += shortest;
                 if (!(numerator < longest))
                 {
@@ -174,20 +170,6 @@ namespace GKProjekt1
 
             return rectangleList;
         }
-
-        //public static Rectangle PutRectangle(double X, double Y, Color color)
-        //{
-        //    Rectangle rectangle = new Rectangle
-        //    {
-        //        Width = 1.0,
-        //        Height = 1.0,
-        //        Fill = new SolidColorBrush(color)
-        //    };
-        //    Canvas.SetLeft(rectangle, X);
-        //    Canvas.SetTop(rectangle, Y);
-        //    Panel.SetZIndex(rectangle, Globals.LineZIndex);
-        //    return rectangle;
-        //}
 
         public void DrawLine(Color color)
         {
@@ -211,44 +193,7 @@ namespace GKProjekt1
             RenderTargetBitmap rtb = new RenderTargetBitmap((int)canvas.ActualWidth, (int)canvas.ActualHeight, 96, 96, PixelFormats.Pbgra32);
             rtb.Render(dv);
 
-            //Image img = new Image();
             lineBresenham.Source = rtb;
-
-            //img.IsHitTestVisible = false;
-            
-            //canvas.Children.Add(img);
-
-            
-            //canvas.Children.Remove(lineBresenham);
-            //lineBresenham = img;
         }
-
-        //private void DrawRubbish2()
-        //{
-        //    DrawingVisual dv = new DrawingVisual();
-        //    using (DrawingContext dc = dv.RenderOpen())
-        //    {
-        //        Random rand = new Random();
-
-        //        for (int i = 0; i < 200; i++)
-        //            dc.DrawRectangle(Brushes.Red, null, new Rect(rand.NextDouble() * 200, rand.NextDouble() * 200, 1, 1));
-
-        //        dc.Close();
-        //    }
-        //    RenderTargetBitmap rtb = new RenderTargetBitmap(200, 200, 96, 96, PixelFormats.Pbgra32);
-        //    rtb.Render(dv);
-        //    Image img = new Image();
-        //    img.Source = rtb;
-        //    canvas.Children.Add(img);
-        //}
-
-        //private void RectangleInCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        //{
-        //    var rect = sender as Image;
-        //    Point p = e.GetPosition(rect);
-        //    Debug.WriteLine($"Hit: ({p.X};{p.Y})");
-        //}
-
-
     }
 }

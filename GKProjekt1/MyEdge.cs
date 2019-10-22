@@ -15,7 +15,6 @@ namespace GKProjekt1
     {
         public MyPoint first { get; set; }
         public MyPoint second { get; set; }
-        //public Line line { get; set; }
         public MyLine myLine { get; set; }
         public RelationIcon relationIcon { get; set; } = null;
         public RelationType relationType { get; set; } = RelationType.None;

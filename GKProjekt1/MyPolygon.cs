@@ -30,14 +30,12 @@ namespace GKProjekt1
             Draw.Verticle(StartingVerticle, this.canvas);
         }
 
-        //BRESENHAM!
         public PolygonDrawResult AddVerticleAndDraw(MyPoint p)
         {
             if (MyPoint.AreNear(p, StartingVerticle, (double)Globals.VerticleClickRadiusSize / 2.0) == true)
             {
                 if (Edges.Count < 2)
                     return PolygonDrawResult.NotEnoughEdges;
-                //Line line = Draw.Edge(LastVerticle, StartingVerticle, canvas);
                 MyEdge e = new MyEdge(LastVerticle, StartingVerticle);
                 Draw.Edge(e, canvas);
                 Edges.Add(e);
@@ -45,8 +43,6 @@ namespace GKProjekt1
             }
             else
             {
-                //Line line = Draw.Edge(LastVerticle, p, canvas);
-                //Ellipse secondEllipse = Draw.Verticle(p, canvas);
                 Draw.Verticle(p, canvas);
                 MyEdge e = new MyEdge(LastVerticle, p);
                 Draw.Edge(e, canvas);
@@ -56,18 +52,14 @@ namespace GKProjekt1
             }
         }
 
-        //BRESENHAM!
         public void MoveVerticle(MyPoint verticle, Point endPoint)
         {
-            //var previousEdge = Edges.Last();
             foreach (var edge in Edges)
             {
                 if (Object.ReferenceEquals(edge.first, verticle) == true)
                 {
                     var previousPoint = new Point(verticle.X, verticle.Y);
                     verticle.Move(endPoint);
-                    //edge.MoveWithPoints();
-                    //previousEdge.MoveWithPoints();
                     var result = ApplyRelationChanges(edge);
                     if (result == false)
                     {
@@ -76,7 +68,6 @@ namespace GKProjekt1
 
                     return;
                 }
-                //previousEdge = edge;
             }
         }
 
@@ -93,8 +84,6 @@ namespace GKProjekt1
             }
             return success;
         }
-
-        //private  bool()
 
         private (bool success, MyPolygon changedPolygon) FixRelationsMovingVerticle(MyEdge startingEdge)
         {
@@ -126,8 +115,7 @@ namespace GKProjekt1
             }
             if (firstSuccess == false)
             {
-                if (CheckIfRelationsAreOK(copyPolygon) == false)
-                    return (false, null);
+                return (false, null);
             }
             endLoop = false;
             //going left (no list order)
@@ -152,8 +140,7 @@ namespace GKProjekt1
             }
             if (secondSuccess == false)
             {
-                if (CheckIfRelationsAreOK(copyPolygon) == false)
-                    return (false, null);
+                return (false, null);
             }
             return (true, copyPolygon);
         }
@@ -400,45 +387,6 @@ namespace GKProjekt1
                 canvas.Children.Remove(edge.first.ellipse);
                 canvas.Children.Remove(edge.second.ellipse);
             }
-        }
-
-        private static bool CheckIfRelationsAreOK(MyPolygon polygon)
-        {
-            MyEdge relationEdge;
-            Vector v1 = new Vector();
-            Vector v2 = new Vector();
-            foreach (var edge in polygon.Edges)
-            {
-                switch (edge.relationType)
-                {
-                    case RelationType.Equal:
-                        relationEdge = edge.relationEdge;
-                        var length = edge.Length();
-                        var relationEdgeLength = relationEdge.Length();
-                        if (Math.Abs(length - relationEdgeLength) > Globals.eps)
-                        {
-                            return false;
-                        }
-                        break;
-                    case RelationType.Perpendicular:
-                        relationEdge = edge.relationEdge;
-                        v1.X = edge.second.X - edge.first.X;
-                        v1.Y = edge.second.Y - edge.first.Y;
-                        v2.X = relationEdge.second.X - relationEdge.first.X;
-                        v2.Y = relationEdge.second.Y - relationEdge.first.Y;
-                        double dotProduct = v1.X * v2.X + v1.Y * v2.Y;
-                        if (Math.Abs(dotProduct) > Globals.eps)
-                        {
-                            return false;
-                        }
-                        break;
-                    case RelationType.None:
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return true;
         }
     }
 }

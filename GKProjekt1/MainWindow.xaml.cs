@@ -25,8 +25,6 @@ namespace GKProjekt1
 
         private Dictionary<int, MyPolygon> Polygons = new Dictionary<int, MyPolygon>();
 
-        //private bool FirstMouseClick = true;
-
         //Pointer Variables
         private bool IsDraggingOn = false;
         private DragObjectType CurrentDragObjectType = DragObjectType.Nothing;
@@ -35,7 +33,6 @@ namespace GKProjekt1
         private object DragObject = null;
 
         //Drawing Variables
-        //BRESENHAM
         private bool PolygonDrawing = false;
         private MyPolygon CurrentlyDrawingPolygon = null;
         private int PolygonNumber = 0;
@@ -49,8 +46,7 @@ namespace GKProjekt1
         public MainWindow()
         {
             InitializeComponent();
-            Panel.SetZIndex(ButtonGridRow, Globals.ButtonsGridZIndex);
-            //Panel.SetZIndex(PolygonCanvas, Globals.CanvasZIndex);
+            Panel.SetZIndex(ButtonGridRow, Globals.ButtonsGridZIndex);            
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -93,7 +89,6 @@ namespace GKProjekt1
                             //check if inside Polygon
                             if (pol.Value.IsPointInside(CurrentMousePosition) == true)
                             {
-                                //Debug.WriteLine($"Hit: {pol.Key}");
                                 CurrentDragObjectType = DragObjectType.Polygon;
                                 IsDraggingOn = true;
                                 DragPolygonId = pol.Key;
@@ -294,20 +289,17 @@ namespace GKProjekt1
                                 case DragObjectType.Verticle:
                                     MyPoint verticle = DragObject as MyPoint;
                                     Polygons[DragPolygonId].MoveVerticle(verticle, CurrentMousePosition);
-                                    currentCanvas.Cursor = Cursors.Wait;
+                                    currentCanvas.Cursor = Cursors.Hand;
                                     return;
-                                    break;
                                 case DragObjectType.Edge:
                                     MyEdge movedEdge = DragObject as MyEdge;
                                     Polygons[DragPolygonId].MoveEdgeParallel(movedEdge, ref DragStartingPoint, ref CurrentMousePosition);
-                                    currentCanvas.Cursor = Cursors.Wait;
+                                    currentCanvas.Cursor = Cursors.Hand;
                                     return;
-                                    break;
                                 case DragObjectType.Polygon:
                                     Polygons[DragPolygonId].MovePolygon(ref DragStartingPoint, ref CurrentMousePosition);
-                                    currentCanvas.Cursor = Cursors.Wait;
+                                    currentCanvas.Cursor = Cursors.Hand;
                                     return;
-                                    break;
                                 case DragObjectType.Nothing:
                                     break;
                                 default:
@@ -342,7 +334,7 @@ namespace GKProjekt1
                                     currentCanvas.Cursor = Cursors.SizeAll;
                                     return;
                                 }
-                            }                            
+                            }
                         }
                         currentCanvas.Cursor = Cursors.Arrow;
                     }
@@ -491,6 +483,58 @@ namespace GKProjekt1
         {
             //TODO:
             //generate sample polygon
+            var pointsList = new List<MyPoint>
+            {                
+                new MyPoint(626d, 57d),
+                new MyPoint(856d, 191d),
+                new MyPoint(744d, 301d),
+                new MyPoint(851d, 532d),
+                new MyPoint(460d, 502d),
+                new MyPoint(367d, 408d),
+                new MyPoint(427d, 149d)
+            };
+
+            MyPolygon polygon = new MyPolygon(pointsList.Last(), PolygonCanvas);
+
+            foreach(var point in pointsList)
+            {
+                polygon.AddVerticleAndDraw(point);
+            }
+
+            Polygons.Add(PolygonNumber, polygon);
+
+
+            polygon.Edges[0].relationEdge = polygon.Edges[3];            
+            polygon.Edges[3].relationEdge = polygon.Edges[0];
+            polygon.Edges[0].relationType = RelationType.Perpendicular;
+            polygon.Edges[3].relationType = RelationType.Perpendicular;
+
+            polygon.ApplyRelationChanges(polygon.Edges[0]);
+
+            polygon.Edges[0].relationIcon = new RelationIcon(polygon.Edges[0], RelationType.Perpendicular, PolygonNumber, polygon, PolygonCanvas);
+            polygon.Edges[3].relationIcon = new RelationIcon(polygon.Edges[3], RelationType.Perpendicular, PolygonNumber, polygon, PolygonCanvas);
+
+            polygon.Edges[1].relationEdge = polygon.Edges[6];
+            polygon.Edges[6].relationEdge = polygon.Edges[1];
+            polygon.Edges[1].relationType = RelationType.Equal;
+            polygon.Edges[6].relationType = RelationType.Equal;
+
+            polygon.ApplyRelationChanges(polygon.Edges[1]);
+
+            polygon.Edges[1].relationIcon = new RelationIcon(polygon.Edges[1], RelationType.Equal, PolygonNumber, polygon, PolygonCanvas);
+            polygon.Edges[6].relationIcon = new RelationIcon(polygon.Edges[6], RelationType.Equal, PolygonNumber, polygon, PolygonCanvas);
+
+            polygon.Edges[2].relationEdge = polygon.Edges[5];
+            polygon.Edges[5].relationEdge = polygon.Edges[2];
+            polygon.Edges[2].relationType = RelationType.Perpendicular;
+            polygon.Edges[5].relationType = RelationType.Perpendicular;
+
+            polygon.ApplyRelationChanges(polygon.Edges[2]);
+
+            polygon.Edges[2].relationIcon = new RelationIcon(polygon.Edges[2], RelationType.Perpendicular, PolygonNumber, polygon, PolygonCanvas);
+            polygon.Edges[5].relationIcon = new RelationIcon(polygon.Edges[5], RelationType.Perpendicular, PolygonNumber, polygon, PolygonCanvas);
+
+            PolygonNumber++;
         }
 
         private void ClearAll()
@@ -641,10 +685,12 @@ namespace GKProjekt1
             }
         }
 
-        //private void RectangleInCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        //{
-        //    Point p = e.GetPosition(RectangleInCanvas);
-        //    Debug.WriteLine($"Hit: ({p.X};{p.Y})");
-        //}
+        private void PolygonCanvas_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Globals.__GenerateSamplePolygon__ == true)
+            {
+                GenerateSamplePolygon();
+            }
+        }
     }
 }

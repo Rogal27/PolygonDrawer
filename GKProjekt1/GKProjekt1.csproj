@@ -116,8 +116,5 @@
   <ItemGroup>
     <Resource Include="Bitmaps\EqualBitmap.bmp" />
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="GrabHand.cur" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
