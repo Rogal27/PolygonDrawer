@@ -29,9 +29,6 @@ namespace GKProjekt1
 
         public static void Edge(MyEdge edge, Canvas canvas)
         {
-            MyLine myLine = new MyLine(canvas);
-            Line line = new Line();
-
             switch (Globals.lineDrawingMode)
             {                
                 case LineDrawingMode.Bresenham:
@@ -42,7 +39,7 @@ namespace GKProjekt1
                     edge.myLine = myLine1;
 
                     //algorytm Bresenhama
-                    myLine1.DrawLine(Globals.DefaultEdgeColor);
+                    myLine1.DrawBresenhamLine(Globals.DefaultEdgeColor);
                     break;
                 case LineDrawingMode.Library:
                     MyLine myLine2 = new MyLine(canvas);
@@ -63,40 +60,23 @@ namespace GKProjekt1
                     edge.myLine = myLine2;
                     break;
                 case LineDrawingMode.AntialiasingWU:
+                    //TODO
                     MyLine myLine3 = new MyLine(canvas);
-                    Line line3 = new Line()
-                    {
-                        X1 = edge.first.X,
-                        Y1 = edge.first.Y,
-                        X2 = edge.second.X,
-                        Y2 = edge.second.Y,
-                        StrokeThickness = Globals.LineThickness,
-                        Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
-                    };
-                    Panel.SetZIndex(line3, Globals.LineZIndex);
-                    canvas.Children.Add(line3);
-                    //MyLine myLine3 = new MyLine(canvas);
-                    myLine3.lineWindowsControl = line3;
-                    //myLine.canvas = canvas;
+                    myLine3.firstPoint = new Point(edge.first.X, edge.first.Y);
+                    myLine3.secondPoint = new Point(edge.second.X, edge.second.Y);
+
                     edge.myLine = myLine3;
+
+                    myLine3.DrawAntialiasedWULine(Globals.DefaultEdgeColor);
                     break;
                 case LineDrawingMode.BresenhamSymmetric:
                     MyLine myLine4 = new MyLine(canvas);
-                    Line line4 = new Line()
-                    {
-                        X1 = edge.first.X,
-                        Y1 = edge.first.Y,
-                        X2 = edge.second.X,
-                        Y2 = edge.second.Y,
-                        StrokeThickness = Globals.LineThickness,
-                        Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
-                    };
-                    Panel.SetZIndex(line4, Globals.LineZIndex);
-                    canvas.Children.Add(line4);
-                    //MyLine myLine4 = new MyLine(canvas);
-                    myLine4.lineWindowsControl = line4;
-                    //myLine.canvas = canvas;
+                    myLine4.firstPoint = new Point(edge.first.X, edge.first.Y);
+                    myLine4.secondPoint = new Point(edge.second.X, edge.second.Y);
+
                     edge.myLine = myLine4;
+
+                    myLine4.DrawBresenhamSymmetricLine(Globals.DefaultEdgeColor);
                     break;
                 default:
                     break;
@@ -105,35 +85,53 @@ namespace GKProjekt1
 
         public static MyLine SimpleEdge(Point first, Point second, Canvas canvas)//used to draw temporary lines
         {
-            if (Globals.__BresenhamOff__ == true)
+            switch (Globals.lineDrawingMode)
             {
-                Line line = new Line()
-                {
-                    X1 = first.X,
-                    Y1 = first.Y,
-                    X2 = second.X,
-                    Y2 = second.Y,
-                    StrokeThickness = Globals.LineThickness,
-                    Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
-                };
-                Panel.SetZIndex(line, Globals.LineZIndex);
-                canvas.Children.Add(line);
-                MyLine myLine = new MyLine(canvas);
-                myLine.lineWindowsControl = line;
-                //myLine.canvas = canvas;
-                return myLine;
-            }
-            else
-            {
-                MyLine myLine = new MyLine(canvas);
+                case LineDrawingMode.Bresenham:
+                    MyLine myLine1 = new MyLine(canvas);
 
-                myLine.firstPoint = first;
-                myLine.secondPoint = second;
+                    myLine1.firstPoint = first;
+                    myLine1.secondPoint = second;
 
-                //algorytm Bresenhama
-                myLine.DrawLine(Globals.DefaultEdgeColor);
-                
-                return myLine;
+                    myLine1.DrawBresenhamLine(Globals.DefaultEdgeColor);
+
+                    return myLine1;
+                case LineDrawingMode.Library:
+                    MyLine myLine2 = new MyLine(canvas);
+                    Line line2 = new Line()
+                    {
+                        X1 = first.X,
+                        Y1 = first.Y,
+                        X2 = second.X,
+                        Y2 = second.Y,
+                        StrokeThickness = Globals.LineThickness,
+                        Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
+                    };
+                    Panel.SetZIndex(line2, Globals.LineZIndex);
+                    canvas.Children.Add(line2);                    
+                    myLine2.lineWindowsControl = line2;
+                    return myLine2;
+                case LineDrawingMode.AntialiasingWU:
+                    //TODO
+                    MyLine myLine3 = new MyLine(canvas);
+
+                    myLine3.firstPoint = first;
+                    myLine3.secondPoint = second;
+
+                    myLine3.DrawBresenhamLine(Globals.DefaultEdgeColor);
+
+                    return myLine3;
+                case LineDrawingMode.BresenhamSymmetric:
+                    MyLine myLine4 = new MyLine(canvas);
+
+                    myLine4.firstPoint = first;
+                    myLine4.secondPoint = second;
+
+                    myLine4.DrawBresenhamSymmetricLine(Globals.DefaultEdgeColor);
+
+                    return myLine4;
+                default:
+                    return null;
             }
         }
 
