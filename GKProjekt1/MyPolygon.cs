@@ -159,6 +159,22 @@ namespace GKProjekt1
             }
         }
 
+        public void ChangePolygonLineDrawingMethodBefore()
+        {
+            foreach (var edge in Edges)
+            {
+                edge.DeleteDrawing();
+            }
+        }
+
+        public void ChangePolygonLineDrawingMethodAfter()
+        {
+            foreach (var edge in Edges)
+            {
+                Draw.Edge(edge, canvas);
+            }
+        }
+
         public bool DeleteVerticle(MyPoint verticle)
         {
             if (Edges.Count > 3)
@@ -175,7 +191,7 @@ namespace GKProjekt1
                         previousEdge.MoveWithPoints();
 
                         canvas.Children.Remove(edge.first.ellipse);
-                        edge.DeleteDrawing(canvas);
+                        edge.DeleteDrawing();
 
                         Edges.Remove(edge);
 
@@ -383,7 +399,7 @@ namespace GKProjekt1
             foreach (var edge in Edges)
             {
                 edge.DeleteRelation();
-                edge.DeleteDrawing(canvas);
+                edge.DeleteDrawing();
                 canvas.Children.Remove(edge.first.ellipse);
                 canvas.Children.Remove(edge.second.ellipse);
             }

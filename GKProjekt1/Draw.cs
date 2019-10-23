@@ -29,34 +29,77 @@ namespace GKProjekt1
 
         public static void Edge(MyEdge edge, Canvas canvas)
         {
-            if (Globals.__BresenhamOff__ == true)
-            {
-                Line line = new Line()
-                {
-                    X1 = edge.first.X,
-                    Y1 = edge.first.Y,
-                    X2 = edge.second.X,
-                    Y2 = edge.second.Y,
-                    StrokeThickness = Globals.LineThickness,
-                    Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
-                };
-                Panel.SetZIndex(line, Globals.LineZIndex);
-                canvas.Children.Add(line);
-                MyLine myLine = new MyLine();
-                myLine.lineWindowsControl = line;
-                myLine.canvas = canvas;
-                edge.myLine = myLine;
-            }
-            else
-            {
-                MyLine myLine = new MyLine(canvas);
-                myLine.firstPoint = new Point(edge.first.X, edge.first.Y);
-                myLine.secondPoint = new Point(edge.second.X, edge.second.Y);
+            MyLine myLine = new MyLine(canvas);
+            Line line = new Line();
 
-                edge.myLine = myLine;
+            switch (Globals.lineDrawingMode)
+            {                
+                case LineDrawingMode.Bresenham:
+                    MyLine myLine1 = new MyLine(canvas);
+                    myLine1.firstPoint = new Point(edge.first.X, edge.first.Y);
+                    myLine1.secondPoint = new Point(edge.second.X, edge.second.Y);
 
-                //algorytm Bresenhama
-                myLine.DrawLine(Globals.DefaultEdgeColor);                
+                    edge.myLine = myLine1;
+
+                    //algorytm Bresenhama
+                    myLine1.DrawLine(Globals.DefaultEdgeColor);
+                    break;
+                case LineDrawingMode.Library:
+                    MyLine myLine2 = new MyLine(canvas);
+                    Line line2 = new Line()
+                    {
+                        X1 = edge.first.X,
+                        Y1 = edge.first.Y,
+                        X2 = edge.second.X,
+                        Y2 = edge.second.Y,
+                        StrokeThickness = Globals.LineThickness,
+                        Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
+                    };
+                    Panel.SetZIndex(line2, Globals.LineZIndex);
+                    canvas.Children.Add(line2);
+                    //myLine = new MyLine(canvas);
+                    myLine2.lineWindowsControl = line2;
+                    //myLine.canvas = canvas;
+                    edge.myLine = myLine2;
+                    break;
+                case LineDrawingMode.AntialiasingWU:
+                    MyLine myLine3 = new MyLine(canvas);
+                    Line line3 = new Line()
+                    {
+                        X1 = edge.first.X,
+                        Y1 = edge.first.Y,
+                        X2 = edge.second.X,
+                        Y2 = edge.second.Y,
+                        StrokeThickness = Globals.LineThickness,
+                        Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
+                    };
+                    Panel.SetZIndex(line3, Globals.LineZIndex);
+                    canvas.Children.Add(line3);
+                    //MyLine myLine3 = new MyLine(canvas);
+                    myLine3.lineWindowsControl = line3;
+                    //myLine.canvas = canvas;
+                    edge.myLine = myLine3;
+                    break;
+                case LineDrawingMode.BresenhamSymmetric:
+                    MyLine myLine4 = new MyLine(canvas);
+                    Line line4 = new Line()
+                    {
+                        X1 = edge.first.X,
+                        Y1 = edge.first.Y,
+                        X2 = edge.second.X,
+                        Y2 = edge.second.Y,
+                        StrokeThickness = Globals.LineThickness,
+                        Stroke = new SolidColorBrush(Globals.DefaultEdgeColor)
+                    };
+                    Panel.SetZIndex(line4, Globals.LineZIndex);
+                    canvas.Children.Add(line4);
+                    //MyLine myLine4 = new MyLine(canvas);
+                    myLine4.lineWindowsControl = line4;
+                    //myLine.canvas = canvas;
+                    edge.myLine = myLine4;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -75,9 +118,9 @@ namespace GKProjekt1
                 };
                 Panel.SetZIndex(line, Globals.LineZIndex);
                 canvas.Children.Add(line);
-                MyLine myLine = new MyLine();
+                MyLine myLine = new MyLine(canvas);
                 myLine.lineWindowsControl = line;
-                myLine.canvas = canvas;
+                //myLine.canvas = canvas;
                 return myLine;
             }
             else

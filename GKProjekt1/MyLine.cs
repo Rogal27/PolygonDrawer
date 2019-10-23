@@ -22,111 +22,204 @@ namespace GKProjekt1
         public Point secondPoint { get; set; }
         public Canvas canvas { get; set; }
 
-        public MyLine()
-        {
+        //public MyLine()
+        //{
 
-        }
+        //}
         public MyLine(Canvas canvas)
         {
-            if (Globals.__BresenhamOff__ == true)
+            this.canvas = canvas;
+            switch (Globals.lineDrawingMode)
             {
-            }
-            else
-            {
-                lineBresenham = new Image();
-                lineBresenham.IsHitTestVisible = false;
-                Panel.SetZIndex(lineBresenham, Globals.LineZIndex);
-                this.canvas = canvas;
-                this.canvas.Children.Add(lineBresenham);
+                case LineDrawingMode.Bresenham:
+                    lineBresenham = new Image();
+                    lineBresenham.IsHitTestVisible = false;
+                    Panel.SetZIndex(lineBresenham, Globals.LineZIndex);
+                    this.canvas = canvas;
+                    this.canvas.Children.Add(lineBresenham);
+                    break;
+                case LineDrawingMode.Library:
+                    break;
+                case LineDrawingMode.AntialiasingWU:
+                    break;
+                case LineDrawingMode.BresenhamSymmetric:
+                    break;
+                default:
+                    break;
             }
         }
 
         public void SetPoints(MyPoint first, MyPoint second)
         {
-            if (Globals.__BresenhamOff__ == true)
+            switch (Globals.lineDrawingMode)
             {
-                lineWindowsControl.X1 = first.X;
-                lineWindowsControl.Y1 = first.Y;
-                lineWindowsControl.X2 = second.X;
-                lineWindowsControl.Y2 = second.Y;
-            }
-            else
-            {
-                firstPoint = new Point(first.X, first.Y);
-                secondPoint = new Point(second.X, second.Y);
-                DrawLine(Globals.DefaultEdgeColor);
+                case LineDrawingMode.Bresenham:
+                    firstPoint = new Point(first.X, first.Y);
+                    secondPoint = new Point(second.X, second.Y);
+                    DrawLine(Globals.DefaultEdgeColor);
+                    break;
+                case LineDrawingMode.Library:                    
+                    lineWindowsControl.X1 = first.X;
+                    lineWindowsControl.Y1 = first.Y;
+                    lineWindowsControl.X2 = second.X;
+                    lineWindowsControl.Y2 = second.Y;
+                    break;
+                case LineDrawingMode.AntialiasingWU:
+                    //TODO:
+                    lineWindowsControl.X1 = first.X;
+                    lineWindowsControl.Y1 = first.Y;
+                    lineWindowsControl.X2 = second.X;
+                    lineWindowsControl.Y2 = second.Y;
+                    break;
+                case LineDrawingMode.BresenhamSymmetric:
+                    lineWindowsControl.X1 = first.X;
+                    lineWindowsControl.Y1 = first.Y;
+                    lineWindowsControl.X2 = second.X;
+                    lineWindowsControl.Y2 = second.Y;
+                    break;
+                default:
+                    break;
             }
         }
 
         public void SetFirstPoint(Point first)
         {
-            if (Globals.__BresenhamOff__ == true)
+            switch (Globals.lineDrawingMode)
             {
-                lineWindowsControl.X1 = first.X;
-                lineWindowsControl.Y1 = first.Y;
-            }
-            else
-            {
-                firstPoint = first;
-                DrawLine(Globals.DefaultEdgeColor);
+                case LineDrawingMode.Bresenham:
+                    firstPoint = first;
+                    DrawLine(Globals.DefaultEdgeColor);
+                    break;
+                case LineDrawingMode.Library:
+                    lineWindowsControl.X1 = first.X;
+                    lineWindowsControl.Y1 = first.Y;
+                    break;
+                case LineDrawingMode.AntialiasingWU:
+                    lineWindowsControl.X1 = first.X;
+                    lineWindowsControl.Y1 = first.Y;
+                    break;
+                case LineDrawingMode.BresenhamSymmetric:
+                    lineWindowsControl.X1 = first.X;
+                    lineWindowsControl.Y1 = first.Y;
+                    break;
+                default:
+                    break;
             }
         }
 
         public void SetSecondPoint(Point second)
         {
-            if (Globals.__BresenhamOff__ == true)
+            switch (Globals.lineDrawingMode)
             {
-                lineWindowsControl.X2 = second.X;
-                lineWindowsControl.Y2 = second.Y;
-            }
-            else
-            {
-                secondPoint = second;
-                DrawLine(Globals.DefaultEdgeColor);
+                case LineDrawingMode.Bresenham:
+                    secondPoint = second;
+                    DrawLine(Globals.DefaultEdgeColor);
+                    break;
+                case LineDrawingMode.Library:
+                    lineWindowsControl.X2 = second.X;
+                    lineWindowsControl.Y2 = second.Y;
+                    break;
+                case LineDrawingMode.AntialiasingWU:
+                    lineWindowsControl.X2 = second.X;
+                    lineWindowsControl.Y2 = second.Y;
+                    break;
+                case LineDrawingMode.BresenhamSymmetric:
+                    lineWindowsControl.X2 = second.X;
+                    lineWindowsControl.Y2 = second.Y;
+                    break;
+                default:
+                    break;
             }
         }
 
         public void SelectEdge()
         {
-            if (Globals.__BresenhamOff__ == true)
+            DropShadowEffect effect = new DropShadowEffect(); 
+            switch (Globals.lineDrawingMode)
             {
-                var effect = new DropShadowEffect();
-                effect.BlurRadius = Globals.SelectedEdgeBlurRadius;
-                effect.Color = Globals.SelectedEdgeColor;
-                effect.Direction = 0;
-                effect.ShadowDepth = 0;
-                effect.Opacity = 0.9;
-                lineWindowsControl.Stroke = new SolidColorBrush(Globals.SelectedEdgeColor);
-                lineWindowsControl.Effect = effect;
-            }
-            else
-            {
-                DrawLine(Globals.SelectedEdgeColor);
+                case LineDrawingMode.Bresenham:
+                    DrawLine(Globals.SelectedEdgeColor);
+                    break;
+                case LineDrawingMode.Library:
+                    effect = new DropShadowEffect();
+                    effect.BlurRadius = Globals.SelectedEdgeBlurRadius;
+                    effect.Color = Globals.SelectedEdgeColor;
+                    effect.Direction = 0;
+                    effect.ShadowDepth = 0;
+                    effect.Opacity = 0.9;
+                    lineWindowsControl.Stroke = new SolidColorBrush(Globals.SelectedEdgeColor);
+                    lineWindowsControl.Effect = effect;
+                    break;
+                case LineDrawingMode.AntialiasingWU:
+                    effect = new DropShadowEffect();
+                    effect.BlurRadius = Globals.SelectedEdgeBlurRadius;
+                    effect.Color = Globals.SelectedEdgeColor;
+                    effect.Direction = 0;
+                    effect.ShadowDepth = 0;
+                    effect.Opacity = 0.9;
+                    lineWindowsControl.Stroke = new SolidColorBrush(Globals.SelectedEdgeColor);
+                    lineWindowsControl.Effect = effect;
+                    break;
+                case LineDrawingMode.BresenhamSymmetric:
+                    effect = new DropShadowEffect();
+                    effect.BlurRadius = Globals.SelectedEdgeBlurRadius;
+                    effect.Color = Globals.SelectedEdgeColor;
+                    effect.Direction = 0;
+                    effect.ShadowDepth = 0;
+                    effect.Opacity = 0.9;
+                    lineWindowsControl.Stroke = new SolidColorBrush(Globals.SelectedEdgeColor);
+                    lineWindowsControl.Effect = effect;
+                    break;
+                default:
+                    break;
             }
         }
 
         public void UnselectEdge()
         {
-            if (Globals.__BresenhamOff__ == true)
+            switch (Globals.lineDrawingMode)
             {
-                lineWindowsControl.Stroke = new SolidColorBrush(Globals.DefaultEdgeColor);
-                lineWindowsControl.Effect = null;
-            }
-            else
-            {
-                DrawLine(Globals.DefaultEdgeColor);
+                case LineDrawingMode.Bresenham:
+                    DrawLine(Globals.DefaultEdgeColor);
+                    break;
+                case LineDrawingMode.Library:
+                    lineWindowsControl.Stroke = new SolidColorBrush(Globals.DefaultEdgeColor);
+                    lineWindowsControl.Effect = null;
+                    break;
+                case LineDrawingMode.AntialiasingWU:
+                    lineWindowsControl.Stroke = new SolidColorBrush(Globals.DefaultEdgeColor);
+                    lineWindowsControl.Effect = null;
+                    break;
+                case LineDrawingMode.BresenhamSymmetric:
+                    lineWindowsControl.Stroke = new SolidColorBrush(Globals.DefaultEdgeColor);
+                    lineWindowsControl.Effect = null;
+                    break;
+                default:
+                    break;
             }
         }
 
         public void DeleteDrawing()
         {
-            if (Globals.__BresenhamOff__ == true)
+            switch (Globals.lineDrawingMode)
             {
-                canvas.Children.Remove(lineWindowsControl);
-            }
-            else
-            {
-                lineBresenham.Source = null;
+                case LineDrawingMode.Bresenham:
+                    if (lineBresenham != null)
+                    {
+                        lineBresenham.Source = null;
+                    }
+                    break;
+                case LineDrawingMode.Library:
+                    canvas.Children.Remove(lineWindowsControl);
+                    break;
+                case LineDrawingMode.AntialiasingWU:
+                    canvas.Children.Remove(lineWindowsControl);
+                    break;
+                case LineDrawingMode.BresenhamSymmetric:
+                    canvas.Children.Remove(lineWindowsControl);
+                    break;
+                default:
+                    break;
             }
         }
 

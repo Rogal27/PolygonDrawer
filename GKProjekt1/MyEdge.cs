@@ -67,7 +67,7 @@ namespace GKProjekt1
             return Math.Sqrt(x * x + y * y);
         }
 
-        public void DeleteDrawing(Canvas canvas)
+        public void DeleteDrawing()
         {
             myLine.DeleteDrawing();
         }

@@ -41,5 +41,7 @@ namespace GKProjekt1
         public static int RelationFontSize = 16;
         //Math
         public static double eps = 1e-3;
+        //LineDrawingMode
+        public static LineDrawingMode lineDrawingMode = LineDrawingMode.Bresenham;
     }
 }

@@ -692,5 +692,49 @@ namespace GKProjekt1
                 GenerateSamplePolygon();
             }
         }
+
+        private void RedrawPolygonsBefore()
+        {
+            foreach(var pol in Polygons)
+            {
+                pol.Value.ChangePolygonLineDrawingMethodBefore();
+            }
+        }
+
+        private void RedrawPolygonsAfter()
+        {
+            foreach (var pol in Polygons)
+            {
+                pol.Value.ChangePolygonLineDrawingMethodAfter();
+            }
+        }
+
+        private void BresenhamLineMode_Click(object sender, RoutedEventArgs e)
+        {
+            RedrawPolygonsBefore();
+            Globals.lineDrawingMode = LineDrawingMode.Bresenham;
+            RedrawPolygonsAfter();
+        }
+
+        private void LibraryLineMode_Click(object sender, RoutedEventArgs e)
+        {
+            RedrawPolygonsBefore();
+            Globals.lineDrawingMode = LineDrawingMode.Library;
+            RedrawPolygonsAfter();
+        }
+
+        private void AntialiasingWULineMode_Click(object sender, RoutedEventArgs e)
+        {
+            RedrawPolygonsBefore();
+            Globals.lineDrawingMode = LineDrawingMode.AntialiasingWU;
+            RedrawPolygonsAfter();
+        }
+
+        private void BresenhamSymmetricLineMode_Click(object sender, RoutedEventArgs e)
+        {
+            RedrawPolygonsBefore();
+            Globals.lineDrawingMode = LineDrawingMode.BresenhamSymmetric;
+            RedrawPolygonsAfter();
+        }
     }
 }

@@ -60,6 +60,7 @@
     <Compile Include="DragObject.cs" />
     <Compile Include="Draw.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="LineDrawingMode.cs" />
     <Compile Include="MyLine.cs" />
     <Compile Include="MyPoint.cs" />
     <Compile Include="RelationFixer.cs" />

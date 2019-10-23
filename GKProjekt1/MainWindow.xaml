@@ -35,6 +35,10 @@
         <Style TargetType="TextBlock">
             <Setter Property="TextAlignment" Value="Center"/>
         </Style>
+        <Style x:Key="ModeTypeTextBlock"  TargetType="TextBlock">
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -68,6 +72,20 @@
                 <RadioButton Name="DeleteButton" Style="{StaticResource ModeButton}" Click="DeleteMode_Click">
                     <TextBlock Text="Delete Verticle&#10;or Relation (6)" TextAlignment="Center"/>
                 </RadioButton>
+                <StackPanel VerticalAlignment="Center" Margin="15,0,0,0">
+                    <RadioButton GroupName="LineMode" IsChecked="True" Margin="2" Click="BresenhamLineMode_Click">
+                        <TextBlock Text="Bresenham" />
+                    </RadioButton>
+                    <RadioButton GroupName="LineMode" Margin="2" Click="LibraryLineMode_Click">
+                        <TextBlock Text="Biblioteczna"/>
+                    </RadioButton>
+                    <RadioButton GroupName="LineMode" Margin="2" Click="AntialiasingWULineMode_Click">
+                        <TextBlock Text="Antialiasing WU"/>
+                    </RadioButton>
+                    <RadioButton GroupName="LineMode" Margin="2" Click="BresenhamSymmetricLineMode_Click">
+                        <TextBlock Text="Bresenham symteryczny"/>
+                    </RadioButton>
+                </StackPanel>
             </WrapPanel>
             <Button Grid.Column="1" Name="GenerateSamplePolygonButton" Style="{StaticResource RightMenuButton}" Click="GenerateSamplePolygon_Click">
                 <TextBlock Text="Generate Sample Polygon&#10;(9)"/>
