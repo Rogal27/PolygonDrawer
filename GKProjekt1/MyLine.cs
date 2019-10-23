@@ -134,9 +134,96 @@ namespace GKProjekt1
         {
             List<SimplePoint> rectangleList = new List<SimplePoint>();
 
-            //not my bresenham!!!!
-            int w = (int)(second.X - first.X);
-            int h = (int)(second.Y - first.Y);
+            int x1 = (int)first.X;
+            int y1 = (int)first.Y;
+            int x2 = (int)second.X;
+            int y2 = (int)second.Y;
+            int dx, dy;
+            int xi, yi;
+            int dE, dNE;
+            int d;
+            //int dx = x2 - x;
+            //int dy = y2 - y;
+            if (x1 < x2)
+            {
+                xi = 1;
+                dx = x2 - x1;
+            }
+            else
+            {
+                xi = -1;
+                dx = x1 - x2;
+            }
+            if(y1 < y2)
+            {
+                yi = 1;
+                dy = y2 - y1;
+            }
+            else
+            {
+                yi = -1;
+                dy = y1 - y2;
+            }
+            //first pixel
+            rectangleList.Add(new SimplePoint(x1, y1));
+            //moving by OX:
+            if (dx > dy)
+            {
+                dE = 2 * dy;
+                dNE = 2 * (dy - dx);
+                d = dNE - dx;
+                for (; x1 != x2; x1 += xi)
+                {
+                    if (d >= 0) //moving NE 
+                    {
+                        y1 += yi;
+                        d += dNE;
+                    }
+                    else //moving E
+                    {
+                        d += dE;
+                    }
+                    rectangleList.Add(new SimplePoint(x1, y1));
+                    //rectangleList.Add(new SimplePoint(x1, y1 - 1));
+                    //rectangleList.Add(new SimplePoint(x1, y1 + 1));
+                }
+            }
+            else //moving by OY
+            {
+                dE = 2 * dx;
+                dNE = 2 * (dx - dy);
+                d = dNE - dy;
+                for (; y1 != y2; y1 += yi)
+                {
+                    if (d >= 0) //moving NE
+                    {
+                        x1 += xi;
+                        d += dNE;
+                    }
+                    else //moving E
+                    {
+                        d += dE;
+                    }
+                    rectangleList.Add(new SimplePoint(x1, y1));
+                    //rectangleList.Add(new SimplePoint(x1 - 1, y1));
+                    //rectangleList.Add(new SimplePoint(x1 + 1, y1));
+                }
+            }
+
+
+            return rectangleList;
+        }
+
+        private static List<SimplePoint> BresenhamLine2(Point first, Point second)
+        {
+            List<SimplePoint> rectangleList = new List<SimplePoint>();
+
+            int firstX = (int)first.X;
+            int firstY = (int)first.Y;
+            int secondX = (int)second.X;
+            int secondY = (int)second.Y;
+            int w = secondX - firstX;
+            int h = secondY - firstY;
             int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
             if (w < 0) dx1 = -1; else if (w > 0) dx1 = 1;
             if (h < 0) dy1 = -1; else if (h > 0) dy1 = 1;
@@ -153,21 +240,20 @@ namespace GKProjekt1
             int numerator = longest >> 1;
             for (int i = 0; i <= longest; i++)
             {
-                rectangleList.Add(new SimplePoint(first.X, first.Y));
+                rectangleList.Add(new SimplePoint(firstX, firstY));
                 numerator += shortest;
                 if (!(numerator < longest))
                 {
                     numerator -= longest;
-                    first.X += dx1;
-                    first.Y += dy1;
+                    firstX += dx1;
+                    firstY += dy1;
                 }
                 else
                 {
-                    first.X += dx2;
-                    first.Y += dy2;
+                    firstX += dx2;
+                    firstY += dy2;
                 }
             }
-
             return rectangleList;
         }
 
